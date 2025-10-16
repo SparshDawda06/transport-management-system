@@ -332,17 +332,25 @@ def edit_builty(builty_id):
     if form.validate_on_submit():
         try:
             # Update builty fields
-            builty.vehicle_id = form.vehicle_id.data            builty.driver_id = form.driver_id.data            builty.owner_id = form.owner_id.data            builty.date = form.date.data
-            builty.from_station_id = form.from_station_id.data            builty.to_station_id = form.to_station_id.data            builty.firm = form.firm.data
+            builty.vehicle_id = form.vehicle_id.data
+            builty.driver_id = form.driver_id.data
+            builty.owner_id = form.owner_id.data
+            builty.date = form.date.data
+            builty.from_station_id = form.from_station_id.data
+            builty.to_station_id = form.to_station_id.data
+            builty.firm = form.firm.data
             builty.lr_no = form.lr_no.data
             builty.status = form.status.data
             builty.invoice_no = form.invoice_no.data
             builty.eway_bill_no = form.eway_bill_no.data
-            builty.goods_id = form.goods_id.data            builty.actual_weight = form.actual_weight.data
+            builty.goods_id = form.goods_id.data
+            builty.actual_weight = form.actual_weight.data
             builty.charged_weight = form.charged_weight.data
             builty.rate = form.rate.data
             builty.advance_amount = form.advance_amount.data
-            builty.consignor_id = form.consignor_id.data            builty.consignee_id = form.consignee_id.data            builty.booking_agent_id = form.booking_agent_id.data            
+            builty.consignor_id = form.consignor_id.data
+            builty.consignee_id = form.consignee_id.data
+            builty.booking_agent_id = form.booking_agent_id.data
             # Update phone book fields
             builty.consignor_concerned_person_id = request.form.get('consignor_concerned_person_id') if request.form.get('consignor_concerned_person_id') != '' else None
             builty.consignor_phone_number_id = request.form.get('consignor_phone_number_id') if request.form.get('consignor_phone_number_id') != '' else None

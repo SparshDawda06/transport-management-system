@@ -79,7 +79,9 @@ def edit_consignor(item_id):
         c.address = form.address.data
         c.gstin = form.gstin.data
         c.pan = form.pan.data
-        c.station_id = form.station_id.data        c.pin_code_id = form.pin_code_id.data        c.phone = form.phone.data
+        c.station_id = form.station_id.data
+        c.pin_code_id = form.pin_code_id.data
+        c.phone = form.phone.data
         c.email = form.email.data
         db.session.add(c)
         db.session.add(TransactionLog(entity="Consignor", entity_id=c.id, action="UPDATE"))
@@ -139,7 +141,9 @@ def edit_consignee(item_id):
         c.address = form.address.data
         c.gstin = form.gstin.data
         c.pan = form.pan.data
-        c.station_id = form.station_id.data        c.pin_code_id = form.pin_code_id.data        c.phone = form.phone.data
+        c.station_id = form.station_id.data
+        c.pin_code_id = form.pin_code_id.data
+        c.phone = form.phone.data
         c.email = form.email.data
         db.session.add(c)
         db.session.add(TransactionLog(entity="Consignee", entity_id=c.id, action="UPDATE"))
