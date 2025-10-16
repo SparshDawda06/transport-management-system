@@ -249,7 +249,11 @@ _form_templates = {
       <label>GSTIN</label><input name=\"gstin\" />
       <label>PAN</label><input name=\"pan\" />
       <label>Email</label><input name=\"email\" />
-      <button class=\"btn\" type=\"submit\">Save</button>
+      <label>Station</label><select name=\"station_pick\" data-populate-source=\"/api/stations\"></select>
+      <div style=\"display:flex;gap:8px;align-items:center;margin-top:8px;\">
+        <button class=\"btn\" type=\"submit\">Save</button>
+        <button class=\"btn secondary\" data-quick-add=\"stations\" type=\"button\">Add Station</button>
+      </div>
     </form>
     """,
     "stations": """
@@ -455,7 +459,19 @@ def create_agents():
     existing = _dedupe_by_name(BookingAgent, "name", name) if name else None
     if existing:
         return jsonify({"id": existing.id, "label": existing.name})
-    a = BookingAgent(name=name, phone=request.form.get("phone"), gstin=request.form.get("gstin"), pan=request.form.get("pan"), email=request.form.get("email"))
+    
+    # Get station info if station_pick is provided
+    station_id = request.form.get("station_pick")
+    station = Station.query.get(station_id) if station_id else None
+    
+    a = BookingAgent(
+        name=name, 
+        phone=request.form.get("phone"), 
+        gstin=request.form.get("gstin"), 
+        pan=request.form.get("pan"), 
+        email=request.form.get("email"),
+        station_id=station.id if station else None
+    )
     db.session.add(a)
     db.session.commit()
     return jsonify({"id": a.id, "label": a.name})

@@ -45,7 +45,16 @@ A comprehensive Flask-based web application for managing transportation operatio
    gunicorn --bind 0.0.0.0:8000 wsgi:application
    ```
 
-4. **Access the Application**:
+4. **Populate Sample Data** (Optional):
+   ```bash
+   # Quick way to add sample data
+   python3 seed_sample_data.py
+   
+   # Or using Flask CLI
+   FLASK_APP=run.py flask seed-data
+   ```
+
+5. **Access the Application**:
    - Open your browser and go to `http://localhost:8000`
    - Default login: `admin` / `admin123`
 
@@ -105,6 +114,30 @@ app/
 ## Database
 
 The application uses SQLite database by default. The database file will be created automatically in the `instance/` directory.
+
+## 📊 Enhanced Sample Data
+
+The application includes comprehensive sample data with status interactions:
+
+- **Stations**: 20 major Indian railway stations across multiple states
+- **Pin Codes**: 50+ realistic pin codes linked to stations  
+- **Goods**: 20 diverse transportation categories
+- **Consignors**: 10 major companies (Reliance, Tata, Infosys, Wipro, HUL, etc.)
+- **Consignees**: 10 retail/e-commerce companies (Amazon, Flipkart, BigBasket, etc.)
+- **Booking Agents**: 10 logistics companies across different cities
+- **Fleet**: 10 vehicles with owners and drivers
+- **Orders**: 25 sample orders with status variety (NEW, IN_PROGRESS, COMPLETED, CANCELLED)
+- **Builty**: 18 delivery receipts with status interactions (IN_TRANSIT, DELIVERED, PENDING)
+- **Phone Book**: Complete contact management system
+- **Transaction Logs**: 100+ comprehensive audit trail entries
+
+**Status Interactions Demonstrated:**
+- Complete order-to-delivery workflows
+- Status transitions and entity interactions
+- Realistic business scenarios with audit trails
+- Entity relationships and dependencies
+
+See [SAMPLE_DATA.md](SAMPLE_DATA.md) for detailed information about the enhanced sample data.
 
 ## Development
 

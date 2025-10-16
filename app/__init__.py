@@ -44,7 +44,8 @@ def create_app(config_class: type = None) -> Flask:
     app.register_blueprint(auth_bp)
 
     # CLI
-    from .cli import create_db as create_db_command
+    from .cli import create_db as create_db_command, seed_data as seed_data_command
     app.cli.add_command(create_db_command)
+    app.cli.add_command(seed_data_command)
 
     return app

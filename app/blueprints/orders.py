@@ -80,7 +80,17 @@ def list_orders():
         db.joinedload(Order.goods),
         db.joinedload(Order.booking_agent)
     ).order_by(Order.id.desc()).limit(200).all()
-    return render_template("orders/list.html", orders=orders, search_query=search_query, status_filter=status_filter)
+    
+    # Separate orders by type for the template
+    party_orders = [order for order in orders if order.order_type == 'PARTY']
+    agent_orders = [order for order in orders if order.order_type == 'AGENT']
+    
+    return render_template("orders/list.html", 
+                         orders=orders, 
+                         party_orders=party_orders,
+                         agent_orders=agent_orders,
+                         search_query=search_query, 
+                         status_filter=status_filter)
 
 
 @bp.route("/new", methods=["GET", "POST"])
@@ -107,15 +117,36 @@ def create_order():
     if not form.date.data:
         form.date.data = date.today()
 
-    if form.validate_on_submit():
+    # Custom validation for required fields
+    validation_errors = []
+    
+    # Check required fields that need valid IDs (not None)
+    if form.order_type.data == 'PARTY':
+        if form.consignor_id.data is None:
+            validation_errors.append("Consignor is required for Party orders")
+            form.consignor_id.errors.append("Consignor is required")
+        if form.consignee_id.data is None:
+            validation_errors.append("Consignee is required for Party orders")
+            form.consignee_id.errors.append("Consignee is required")
+    elif form.order_type.data == 'AGENT':
+        if form.booking_agent_id.data is None:
+            validation_errors.append("Booking Agent is required for Agent orders")
+            form.booking_agent_id.errors.append("Booking Agent is required")
+    
+    # Check goods is required
+    if form.goods_id.data is None:
+        validation_errors.append("Goods is required")
+        form.goods_id.errors.append("Goods is required")
+    
+    if not validation_errors and form.validate_on_submit():
         try:
             # Check for duplicate submission by looking for recent identical orders
             recent_orders = Order.query.filter_by(
                 date=form.date.data,
                 firm=form.firm.data,
                 order_type=form.order_type.data,
-                consignor_id=form.consignor_id.data if form.consignor_id.data != 0 else None,
-                consignee_id=form.consignee_id.data if form.consignee_id.data != 0 else None,
+                consignor_id=form.consignor_id.data,
+                consignee_id=form.consignee_id.data,
                 goods_id=form.goods_id.data,
                 weight=form.weight.data,
                 rate=form.rate.data
@@ -129,17 +160,17 @@ def create_order():
                 date=form.date.data,
                 firm=form.firm.data,
                 order_type=form.order_type.data,
-                from_station_id=form.from_station_id.data if form.from_station_id.data != 0 else None,
-                to_station_id=form.to_station_id.data if form.to_station_id.data != 0 else None,
-                consignor_id=form.consignor_id.data if form.consignor_id.data != 0 else None,
-                consignee_id=form.consignee_id.data if form.consignee_id.data != 0 else None,
+                from_station_id=form.from_station_id.data,
+                to_station_id=form.to_station_id.data,
+                consignor_id=form.consignor_id.data,
+                consignee_id=form.consignee_id.data,
                 goods_id=form.goods_id.data,
                 weight=form.weight.data,
                 rate=form.rate.data,
                 description=form.description.data,
                 consignor_phone=form.consignor_phone.data,
                 consignee_phone=form.consignee_phone.data,
-                booking_agent_id=form.booking_agent_id.data if form.booking_agent_id.data != 0 else None,
+                booking_agent_id=form.booking_agent_id.data,
                 status=form.status.data or "NEW",
                 # New phone book fields
                 consignor_concerned_person_id=request.form.get('consignor_concerned_person_id') if request.form.get('consignor_concerned_person_id') != '' else None,
@@ -177,6 +208,18 @@ def create_order():
                 return render_template("orders/form.html", form=form, mode="create")
             else:
                 return render_template("orders/form.html", form=form, mode="create")
+    else:
+        # Form validation failed
+        if validation_errors:
+            flash("Please correct the following errors:", "error")
+            for error in validation_errors:
+                flash(error, "error")
+        else:
+            flash("Please correct the errors below", "error")
+            for field, errors in form.errors.items():
+                for error in errors:
+                    flash(f"{field}: {error}", "error")
+                
     return render_template("orders/form.html", form=form, mode="create")
 
 
@@ -200,6 +243,20 @@ def view_order(order_id):
     return render_template("orders/detail.html", order=order)
 
 
+@bp.route("/<int:order_id>", methods=["DELETE"])
+@login_required
+def delete_order(order_id):
+    order = Order.query.get_or_404(order_id)
+    
+    try:
+        db.session.delete(order)
+        db.session.commit()
+        return jsonify({"success": True, "message": "Order deleted successfully"})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": f"Error deleting order: {str(e)}"}), 500
+
+
 @bp.route("/<int:order_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_order(order_id):
@@ -220,17 +277,17 @@ def edit_order(order_id):
             order.date = form.date.data
             order.firm = form.firm.data
             order.order_type = form.order_type.data
-            order.from_station_id = form.from_station_id.data if form.from_station_id.data != 0 else None
-            order.to_station_id = form.to_station_id.data if form.to_station_id.data != 0 else None
-            order.consignor_id = form.consignor_id.data if form.consignor_id.data != 0 else None
-            order.consignee_id = form.consignee_id.data if form.consignee_id.data != 0 else None
+            order.from_station_id = form.from_station_id.data
+            order.to_station_id = form.to_station_id.data
+            order.consignor_id = form.consignor_id.data
+            order.consignee_id = form.consignee_id.data
             order.goods_id = form.goods_id.data
             order.weight = form.weight.data
             order.rate = form.rate.data
             order.description = form.description.data
             order.consignor_phone = form.consignor_phone.data
             order.consignee_phone = form.consignee_phone.data
-            order.booking_agent_id = form.booking_agent_id.data if form.booking_agent_id.data != 0 else None
+            order.booking_agent_id = form.booking_agent_id.data
             # New phone book fields
             order.consignor_concerned_person_id = request.form.get('consignor_concerned_person_id') if request.form.get('consignor_concerned_person_id') != '' else None
             order.consignor_phone_number_id = request.form.get('consignor_phone_number_id') if request.form.get('consignor_phone_number_id') != '' else None
@@ -245,11 +302,11 @@ def edit_order(order_id):
             related_builty = Builty.query.filter_by(order_id=order.id).first()
             if related_builty:
                 # Sync consignor/consignee data from order to builty
-                if form.consignor_id.data and form.consignor_id.data != 0:
+                if form.consignor_id.data:
                     related_builty.consignor_id = form.consignor_id.data
-                if form.consignee_id.data and form.consignee_id.data != 0:
+                if form.consignee_id.data:
                     related_builty.consignee_id = form.consignee_id.data
-                if form.booking_agent_id.data and form.booking_agent_id.data != 0:
+                if form.booking_agent_id.data:
                     related_builty.booking_agent_id = form.booking_agent_id.data
                 db.session.add(related_builty)
             

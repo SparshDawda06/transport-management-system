@@ -427,6 +427,50 @@ TMS.enhanceStationFields = function(context){
   });
 };
 
+// Form validation helper
+TMS.validateForm = function(form) {
+  const errors = [];
+  const requiredFields = form.querySelectorAll('[required]');
+  
+  requiredFields.forEach(field => {
+    if (!field.value.trim()) {
+      errors.push(`${field.labels[0]?.textContent || field.name} is required`);
+      field.classList.add('error');
+    } else {
+      field.classList.remove('error');
+    }
+  });
+  
+  // Email validation
+  const emailFields = form.querySelectorAll('input[type="email"]');
+  emailFields.forEach(field => {
+    if (field.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value)) {
+      errors.push(`${field.labels[0]?.textContent || field.name} must be a valid email`);
+      field.classList.add('error');
+    }
+  });
+  
+  // Phone validation
+  const phoneFields = form.querySelectorAll('input[type="tel"], input[name*="phone"]');
+  phoneFields.forEach(field => {
+    if (field.value && !/^[\d\s\-\+\(\)]+$/.test(field.value)) {
+      errors.push(`${field.labels[0]?.textContent || field.name} must be a valid phone number`);
+      field.classList.add('error');
+    }
+  });
+  
+  // Number validation
+  const numberFields = form.querySelectorAll('input[type="number"]');
+  numberFields.forEach(field => {
+    if (field.value && isNaN(field.value)) {
+      errors.push(`${field.labels[0]?.textContent || field.name} must be a valid number`);
+      field.classList.add('error');
+    }
+  });
+  
+  return errors;
+};
+
 // Enhanced form submission handling with AJAX support
 TMS.handleFormSubmission = function(form) {
   if (!form) return;
@@ -448,6 +492,14 @@ TMS.handleFormSubmission = function(form) {
     if (form.getAttribute('data-submitting') === 'true') {
       return;
     }
+    
+    // Client-side validation
+    const validationErrors = TMS.validateForm(form);
+    if (validationErrors.length > 0) {
+      TMS.showNotification(validationErrors.join('<br>'), 'error', 8000);
+      return;
+    }
+    
     form.setAttribute('data-submitting', 'true');
     
     if (submitBtn) {
@@ -473,10 +525,20 @@ TMS.handleFormSubmission = function(form) {
           if (data.success && data.redirect_url) {
             // Show success message and redirect
             if (data.message) {
-              // You could show a toast notification here
-              console.log('Success:', data.message);
+              // Show success notification
+              TMS.showNotification(data.message, 'success');
             }
             window.location.href = data.redirect_url;
+            return;
+          } else if (data.success === false && data.message) {
+            // Show error message
+            TMS.showNotification(data.message, 'error');
+            // Re-enable button and reset submission flag
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = submitBtn.getAttribute('data-original-text') || 'Save';
+            }
+            form.removeAttribute('data-submitting');
             return;
           }
         }
@@ -550,6 +612,9 @@ TMS.handleFormSubmission = function(form) {
     } catch (error) {
       console.error('Form submission error:', error);
       
+      // Show error notification
+      TMS.showNotification('An error occurred while saving. Please try again.', 'error');
+      
       // Fallback to normal form submission
       if (submitBtn) {
         submitBtn.disabled = false;
@@ -563,6 +628,67 @@ TMS.handleFormSubmission = function(form) {
       form.submit();
     }
   });
+};
+
+// Notification System
+TMS.showNotification = function(message, type = 'info', duration = 5000) {
+  // Remove existing notifications
+  const existingNotifications = document.querySelectorAll('.tms-notification');
+  existingNotifications.forEach(notification => notification.remove());
+  
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `tms-notification tms-notification-${type}`;
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: ${type === 'success' ? '#d4edda' : type === 'error' ? '#f8d7da' : type === 'warning' ? '#fff3cd' : '#d1ecf1'};
+    color: ${type === 'success' ? '#155724' : type === 'error' ? '#721c24' : type === 'warning' ? '#856404' : '#0c5460'};
+    border: 1px solid ${type === 'success' ? '#c3e6cb' : type === 'error' ? '#f5c6cb' : type === 'warning' ? '#ffeaa7' : '#bee5eb'};
+    border-radius: 6px;
+    padding: 12px 16px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 10000;
+    max-width: 400px;
+    font-size: 14px;
+    line-height: 1.4;
+    animation: slideInRight 0.3s ease-out;
+  `;
+  
+  notification.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span style="font-weight: 600;">${message}</span>
+      <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: inherit; cursor: pointer; font-size: 18px; line-height: 1; padding: 0; margin-left: auto;">&times;</button>
+    </div>
+  `;
+  
+  // Add CSS animation
+  if (!document.querySelector('#tms-notification-styles')) {
+    const style = document.createElement('style');
+    style.id = 'tms-notification-styles';
+    style.textContent = `
+      @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes slideOutRight {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  document.body.appendChild(notification);
+  
+  // Auto remove after duration
+  setTimeout(() => {
+    if (notification.parentElement) {
+      notification.style.animation = 'slideOutRight 0.3s ease-in';
+      setTimeout(() => notification.remove(), 300);
+    }
+  }, duration);
 };
 
 // Enhanced initialization

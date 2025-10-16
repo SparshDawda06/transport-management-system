@@ -26,3 +26,14 @@ def create_db():
 
     uri = current_app.config.get("SQLALCHEMY_DATABASE_URI")
     click.echo(f"SQLAlchemy URI set to: {uri}")
+
+
+@click.command("seed-data")
+@with_appcontext
+def seed_data():
+    """Populate the database with sample data for all entities."""
+    from app.sample_data import create_sample_data
+    
+    click.echo("🌱 Seeding database with sample data...")
+    create_sample_data()
+    click.echo("✅ Sample data seeding completed!")

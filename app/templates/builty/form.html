@@ -15,12 +15,48 @@
         Basic Information
       </h3>
       <div class="form-row">
-        <div class="field">{{ form.date.label }}{{ form.date() }}</div>
-        <div class="field">{{ form.order_id.label }}{{ form.order_id(id='order_id') }}</div>
+        <div class="field">
+          {{ form.date.label }}{{ form.date() }}
+          {% if form.date.errors %}
+            <div class="form-error">
+              {% for error in form.date.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+        <div class="field">
+          {{ form.order_id.label }}{{ form.order_id(id='order_id') }}
+          {% if form.order_id.errors %}
+            <div class="form-error">
+              {% for error in form.order_id.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
       </div>
       <div class="form-row">
-        <div class="field">{{ form.firm.label }}{{ form.firm() }}</div>
-        <div class="field">{{ form.status.label }}{{ form.status() }}</div>
+        <div class="field">
+          {{ form.firm.label }}{{ form.firm() }}
+          {% if form.firm.errors %}
+            <div class="form-error">
+              {% for error in form.firm.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+        <div class="field">
+          {{ form.status.label }}{{ form.status() }}
+          {% if form.status.errors %}
+            <div class="form-error">
+              {% for error in form.status.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
       </div>
     </div>
     
@@ -34,17 +70,44 @@
       </h3>
     <div class="form-row">
       <div class="field-with-add">
-        <div class="field">{{ form.vehicle_id.label }}{{ form.vehicle_id(id='vehicle_id') }}</div>
+        <div class="field">
+          {{ form.vehicle_id.label }}{{ form.vehicle_id(id='vehicle_id') }}
+          {% if form.vehicle_id.errors %}
+            <div class="form-error">
+              {% for error in form.vehicle_id.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
         <button class="icon-add" type="button" title="Add Vehicle" onclick="TMS.openInline('vehicles')">+</button>
       </div>
       <div class="field-with-add">
-        <div class="field">{{ form.driver_id.label }}{{ form.driver_id(id='driver_id') }}</div>
+        <div class="field">
+          {{ form.driver_id.label }}{{ form.driver_id(id='driver_id') }}
+          {% if form.driver_id.errors %}
+            <div class="form-error">
+              {% for error in form.driver_id.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
         <button class="icon-add" type="button" title="Add Driver" onclick="TMS.openInline('drivers')">+</button>
       </div>
     </div>
     <div class="form-row">
       <div class="field-with-add">
-        <div class="field">{{ form.owner_id.label }}{{ form.owner_id(id='owner_id') }}</div>
+        <div class="field">
+          {{ form.owner_id.label }}{{ form.owner_id(id='owner_id') }}
+          {% if form.owner_id.errors %}
+            <div class="form-error">
+              {% for error in form.owner_id.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
         <button class="icon-add" type="button" title="Add Owner" onclick="TMS.openInline('owners')">+</button>
       </div>
     </div>
@@ -60,11 +123,29 @@
       </h3>
     <div class="form-row">
       <div class="field-with-add">
-        <div class="field">{{ form.from_station_id.label }}{{ form.from_station_id(id='from_station_id') }}</div>
+        <div class="field">
+          {{ form.from_station_id.label }}{{ form.from_station_id(id='from_station_id') }}
+          {% if form.from_station_id.errors %}
+            <div class="form-error">
+              {% for error in form.from_station_id.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
         <button class="icon-add" type="button" title="Add Station" onclick="TMS.openInline('stations')">+</button>
       </div>
       <div class="field-with-add">
-        <div class="field">{{ form.to_station_id.label }}{{ form.to_station_id(id='to_station_id') }}</div>
+        <div class="field">
+          {{ form.to_station_id.label }}{{ form.to_station_id(id='to_station_id') }}
+          {% if form.to_station_id.errors %}
+            <div class="form-error">
+              {% for error in form.to_station_id.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
         <button class="icon-add" type="button" title="Add Station" onclick="TMS.openInline('stations')">+</button>
       </div>
     </div>
@@ -89,7 +170,16 @@
         </h4>
     <div class="form-row">
       <div class="field-with-add">
-        <div class="field">{{ form.consignor_id.label }}{{ form.consignor_id(id='builty_consignor_id') }}</div>
+        <div class="field">
+          {{ form.consignor_id.label }}{{ form.consignor_id(id='builty_consignor_id') }}
+          {% if form.consignor_id.errors %}
+            <div class="form-error">
+              {% for error in form.consignor_id.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
         <button class="icon-add" type="button" title="Add Consignor" onclick="TMS.openInline('consignors')">+</button>
       </div>
     </div>
@@ -127,7 +217,16 @@
         </h4>
     <div class="form-row">
       <div class="field-with-add">
-        <div class="field">{{ form.consignee_id.label }}{{ form.consignee_id(id='builty_consignee_id') }}</div>
+        <div class="field">
+          {{ form.consignee_id.label }}{{ form.consignee_id(id='builty_consignee_id') }}
+          {% if form.consignee_id.errors %}
+            <div class="form-error">
+              {% for error in form.consignee_id.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
         <button class="icon-add" type="button" title="Add Consignee" onclick="TMS.openInline('consignees')">+</button>
       </div>
     </div>
@@ -165,7 +264,16 @@
         </h4>
 <div class="form-row">
   <div class="field-with-add">
-    <div class="field">{{ form.booking_agent_id.label }}{{ form.booking_agent_id(id='builty_booking_agent_id') }}</div>
+    <div class="field">
+      {{ form.booking_agent_id.label }}{{ form.booking_agent_id(id='builty_booking_agent_id') }}
+      {% if form.booking_agent_id.errors %}
+        <div class="form-error">
+          {% for error in form.booking_agent_id.errors %}
+            <div>{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
     <button class="icon-add" type="button" title="Add Agent" onclick="TMS.openInline('booking_agents')">+</button>
   </div>
 </div>
@@ -205,21 +313,66 @@
     <h3 style="margin-top:20px;margin-bottom:10px;font-size:16px;">Goods & Weight</h3>
     <div class="form-row">
       <div class="field-with-add">
-        <div class="field">{{ form.goods_id.label }}{{ form.goods_id(id='goods_id') }}</div>
+        <div class="field">
+          {{ form.goods_id.label }}{{ form.goods_id(id='goods_id') }}
+          {% if form.goods_id.errors %}
+            <div class="form-error">
+              {% for error in form.goods_id.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
         <button class="icon-add" type="button" title="Add Goods" onclick="TMS.openInline('goods')">+</button>
       </div>
-      <div class="field">{{ form.actual_weight.label }}{{ form.actual_weight(id='actual_weight') }}</div>
+      <div class="field">
+        {{ form.actual_weight.label }}{{ form.actual_weight(id='actual_weight') }}
+        {% if form.actual_weight.errors %}
+          <div class="form-error">
+            {% for error in form.actual_weight.errors %}
+              <div>{{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
     </div>
     <div class="form-row">
-      <div class="field">{{ form.charged_weight.label }}{{ form.charged_weight(id='charged_weight') }}</div>
-      <div class="field">{{ form.rate.label }}{{ form.rate(id='rate') }}</div>
+      <div class="field">
+        {{ form.charged_weight.label }}{{ form.charged_weight(id='charged_weight') }}
+        {% if form.charged_weight.errors %}
+          <div class="form-error">
+            {% for error in form.charged_weight.errors %}
+              <div>{{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+      <div class="field">
+        {{ form.rate.label }}{{ form.rate(id='rate') }}
+        {% if form.rate.errors %}
+          <div class="form-error">
+            {% for error in form.rate.errors %}
+              <div>{{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
     </div>
     <div class="form-row">
       <div class="field">
         <label>Total Amount</label>
         <input type="text" id="total_amount" readonly style="background:#f3f4f6;" value="0.00">
       </div>
-      <div class="field">{{ form.advance_amount.label }}{{ form.advance_amount(id='advance_amount') }}</div>
+      <div class="field">
+        {{ form.advance_amount.label }}{{ form.advance_amount(id='advance_amount') }}
+        {% if form.advance_amount.errors %}
+          <div class="form-error">
+            {% for error in form.advance_amount.errors %}
+              <div>{{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
     </div>
     <div class="form-row">
       <div class="field">
@@ -230,11 +383,38 @@
     
     <h3 style="margin-top:20px;margin-bottom:10px;font-size:16px;">Documentation</h3>
     <div class="form-row">
-      <div class="field">{{ form.lr_no.label }}{{ form.lr_no() }}</div>
-      <div class="field">{{ form.invoice_no.label }}{{ form.invoice_no() }}</div>
+      <div class="field">
+        {{ form.lr_no.label }}{{ form.lr_no() }}
+        {% if form.lr_no.errors %}
+          <div class="form-error">
+            {% for error in form.lr_no.errors %}
+              <div>{{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+      <div class="field">
+        {{ form.invoice_no.label }}{{ form.invoice_no() }}
+        {% if form.invoice_no.errors %}
+          <div class="form-error">
+            {% for error in form.invoice_no.errors %}
+              <div>{{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
     </div>
     <div class="form-row">
-      <div class="field">{{ form.eway_bill_no.label }}{{ form.eway_bill_no() }}</div>
+      <div class="field">
+        {{ form.eway_bill_no.label }}{{ form.eway_bill_no() }}
+        {% if form.eway_bill_no.errors %}
+          <div class="form-error">
+            {% for error in form.eway_bill_no.errors %}
+              <div>{{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
     </div>
     
     <button class="btn" type="submit" style="margin-top:20px;">Save Builty</button>
@@ -250,6 +430,9 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/searchable-dropdown.js') }}"></script>
 <script>
+// Builty form now uses unified relationship logic from relationship-logic.js
+// The TMSRelationshipManager will automatically initialize for builty forms
+
 // Global variables for builty form
 let consignorSelect, consigneeSelect, agentSelect;
 let vehicleData = {};
@@ -823,7 +1006,11 @@ TMS.inlineSaved = async function(entity, id, label){
     'drivers': 'driver_id',
     'owners': 'owner_id',
     'stations': ['from_station_id','to_station_id'],
-    'goods': 'goods_id'
+    'goods': 'goods_id',
+    'consignors': 'builty_consignor_id',
+    'consignees': 'builty_consignee_id',
+    'booking_agents': 'builty_booking_agent_id',
+    'orders': 'order_id'
   };
   const target = map[entity];
   if(!target) return TMS.closeInline();
@@ -838,12 +1025,20 @@ TMS.inlineSaved = async function(entity, id, label){
         if (entity === 'vehicles' && sel.id === 'vehicle_id') {
           sel.dispatchEvent(new Event('change'));
         }
+        // Trigger change event for entity relationships
+        if (['consignors', 'consignees', 'booking_agents'].includes(entity)) {
+          sel.dispatchEvent(new Event('change'));
+        }
       } else {
         const newOpt = document.createElement('option');
         newOpt.value = id;
         newOpt.textContent = label;
         newOpt.selected = true;
         sel.appendChild(newOpt);
+        // Trigger change event for new options
+        if (['consignors', 'consignees', 'booking_agents'].includes(entity)) {
+          sel.dispatchEvent(new Event('change'));
+        }
       }
     }
   });

@@ -1,9 +1,12 @@
 {% extends 'base.html' %}
 {% block title %}Phone Book{% endblock %}
 {% block content %}
-<div class="page-header">
-  <h1 class="page-title">Phone Book</h1>
-  <div class="page-actions">
+<div class="page-header-fixed">
+  <div>
+    <h1 class="page-title">Phone Book</h1>
+    <p class="text-secondary">Phone Directory</p>
+  </div>
+  <div class="header-controls">
     {% if entity_type and entity_id %}
     <button class="btn btn-primary" onclick="addPhoneForEntity('{{ entity_type }}', {{ entity_id }})">Add Phone</button>
     {% endif %}
@@ -15,14 +18,16 @@
 
 <div class="card">
   <div class="card-header">
-    <h2 class="card-title">Phone Directory</h2>
-    <p class="card-subtitle">
-      {% if entity_type and entity_id %}
-        Manage phone numbers for {{ entity_type }} #{{ entity_id }}
-      {% else %}
-        Search and manage phone numbers for all entities
-      {% endif %}
-    </p>
+    <div>
+      <h2 class="card-title">Phone Directory</h2>
+      <p class="card-subtitle">
+        {% if entity_type and entity_id %}
+          Manage phone numbers for {{ entity_type }} #{{ entity_id }}
+        {% else %}
+          Search and manage phone numbers for all entities
+        {% endif %}
+      </p>
+    </div>
   </div>
   
   <div class="card-content">
@@ -46,48 +51,47 @@
       </div>
     </div>
   
-  <div id="phoneResults" style="margin-top: 16px;">
-    <div style="text-align: center; color: #666; padding: 40px;">
-      <div class="empty-state-icon phone-icon"></div>
-      <p>Start typing to search phone numbers, names, or companies</p>
+    <div id="phoneResults" class="mt-4">
+      <div class="empty-state">
+        <div class="empty-state-icon phone-icon"></div>
+        <p class="empty-state-description">Start typing to search phone numbers, names, or companies</p>
+      </div>
     </div>
   </div>
 </div>
 
-<div id="phoneModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);align-items:center;justify-content:center;z-index:1000;">
-  <div style="background:#fff;padding:24px;border-radius:12px;min-width:400px;max-width:90vw;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+<div id="phoneModal" class="modal-overlay" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-header">
       <h3 id="modalTitle">Add Phone Number</h3>
-      <button id="closeModal" style="background:none;border:none;font-size:24px;cursor:pointer;">&times;</button>
+      <button id="closeModal" class="modal-close">&times;</button>
     </div>
     
-    <form id="phoneForm">
+    <form id="phoneForm" class="modal-form">
       <input type="hidden" id="phoneId" name="phone_id">
       <input type="hidden" id="entityType" name="entity_type">
       <input type="hidden" id="entityId" name="entity_id">
       
-      <div class="field" style="margin-bottom:16px;">
-        <label for="phoneNumber">Phone Number</label>
-        <input type="text" id="phoneNumber" name="phone_number" required 
-               style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid var(--border);">
+      <div class="form-group">
+        <label for="phoneNumber" class="form-label">Phone Number</label>
+        <input type="text" id="phoneNumber" name="phone_number" required class="form-input">
       </div>
       
-      <div class="field" style="margin-bottom:16px;">
-        <label for="phoneLabel">Label (Optional)</label>
-        <input type="text" id="phoneLabel" name="label" placeholder="e.g., Mobile, Office, Home"
-               style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid var(--border);">
+      <div class="form-group">
+        <label for="phoneLabel" class="form-label">Label (Optional)</label>
+        <input type="text" id="phoneLabel" name="label" placeholder="e.g., Mobile, Office, Home" class="form-input">
       </div>
       
-      <div class="field" style="margin-bottom:20px;">
-        <label style="display:flex;align-items:center;gap:8px;">
+      <div class="form-group">
+        <label class="form-label" style="display:flex;align-items:center;gap:8px;">
           <input type="checkbox" id="isPrimary" name="is_primary">
           <span>Set as primary phone number</span>
         </label>
       </div>
       
-      <div style="display:flex;gap:12px;justify-content:flex-end;">
-        <button type="button" id="cancelPhone" class="btn secondary">Cancel</button>
-        <button type="submit" class="btn">Save Phone</button>
+      <div class="form-actions">
+        <button type="button" id="cancelPhone" class="btn btn-secondary">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Phone</button>
       </div>
     </form>
   </div>
@@ -140,9 +144,9 @@ class PhoneBookManager {
     
     if (!query) {
       this.resultsContainer.innerHTML = `
-        <div style="text-align: center; color: #666; padding: 40px;">
+        <div class="empty-state">
           <div class="empty-state-icon phone-icon"></div>
-          <p>Start typing to search phone numbers, names, or companies</p>
+          <p class="empty-state-description">Start typing to search phone numbers, names, or companies</p>
         </div>
       `;
       return;
@@ -154,24 +158,25 @@ class PhoneBookManager {
       
       if (results.length === 0) {
         this.resultsContainer.innerHTML = `
-          <div style="text-align: center; color: #666; padding: 40px;">
+          <div class="empty-state">
             <div class="empty-state-icon search-icon"></div>
-            <p>No phone numbers found for "${query}"</p>
+            <p class="empty-state-description">No phone numbers found for "${query}"</p>
           </div>
         `;
         return;
       }
       
       this.resultsContainer.innerHTML = `
-        <div style="display: grid; gap: 12px;">
+        <div class="grid gap-3">
           ${results.map(phone => this.renderPhoneCard(phone)).join('')}
         </div>
       `;
     } catch (error) {
       console.error('Search error:', error);
       this.resultsContainer.innerHTML = `
-        <div style="text-align: center; color: #e74c3c; padding: 40px;">
-          <p>Error searching phone numbers</p>
+        <div class="empty-state">
+          <div class="empty-state-icon" style="background: var(--danger);"></div>
+          <p class="empty-state-description" style="color: var(--danger);">Error searching phone numbers</p>
         </div>
       `;
     }
@@ -187,31 +192,31 @@ class PhoneBookManager {
     }[phone.entity_type] || 'phone-icon';
     
     return `
-      <div class="phone-card" style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; background: white;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-          <div style="flex: 1;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+      <div class="phone-card">
+        <div class="phone-card-header">
+          <div class="phone-card-content">
+            <div class="phone-entity-info">
               <span class="entity-type-icon ${entityIcon}"></span>
-              <strong>${phone.entity_name}</strong>
-              <span style="background: #f3f4f6; padding: 2px 8px; border-radius: 4px; font-size: 12px; text-transform: uppercase;">${phone.entity_type}</span>
-              ${phone.is_primary ? '<span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">PRIMARY</span>' : ''}
+              <span class="phone-entity-name">${phone.entity_name}</span>
+              <span class="phone-entity-type">${phone.entity_type}</span>
+              ${phone.is_primary ? '<span class="phone-primary-badge">PRIMARY</span>' : ''}
             </div>
             ${phone.person_name ? `
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-              <span style="color: #666; font-size: 14px;"><span class="person-icon"></span> ${phone.person_name}</span>
-              ${phone.person_designation ? `<span style="color: #999; font-size: 12px;">(${phone.person_designation})</span>` : ''}
-              ${phone.person_is_primary ? '<span style="background: #3b82f6; color: white; padding: 1px 6px; border-radius: 3px; font-size: 10px;">PRIMARY CONTACT</span>' : ''}
+            <div class="phone-person-info">
+              <span class="phone-person-name"><span class="person-icon"></span> ${phone.person_name}</span>
+              ${phone.person_designation ? `<span class="phone-person-designation">(${phone.person_designation})</span>` : ''}
+              ${phone.person_is_primary ? '<span class="phone-person-primary">PRIMARY CONTACT</span>' : ''}
             </div>
             ` : ''}
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <span style="font-family: monospace; font-size: 16px; font-weight: bold;">${phone.phone_number}</span>
-              ${phone.label ? `<span style="color: #666; font-size: 14px;">(${phone.label})</span>` : ''}
+            <div class="phone-number-info">
+              <span class="phone-number">${phone.phone_number}</span>
+              ${phone.label ? `<span class="phone-label">(${phone.label})</span>` : ''}
             </div>
           </div>
-          <div style="display: flex; gap: 8px;">
-            <button class="btn small secondary" onclick="phoneBookManager.editPhone(${phone.id}, '${phone.entity_type}', ${phone.entity_id}, '${phone.phone_number}', '${phone.label || ''}', ${phone.is_primary})">Edit</button>
-            ${!phone.is_primary ? `<button class="btn small" onclick="phoneBookManager.setPrimary(${phone.id})">Set Primary</button>` : ''}
-            <button class="btn small secondary" onclick="phoneBookManager.deletePhone(${phone.id})" style="color: #e74c3c;">Delete</button>
+          <div class="phone-card-actions">
+            <button class="btn btn-small btn-secondary" onclick="phoneBookManager.editPhone(${phone.id}, '${phone.entity_type}', ${phone.entity_id}, '${phone.phone_number}', '${phone.label || ''}', ${phone.is_primary})">Edit</button>
+            ${!phone.is_primary ? `<button class="btn btn-small btn-primary" onclick="phoneBookManager.setPrimary(${phone.id})">Set Primary</button>` : ''}
+            <button class="btn btn-small btn-danger" onclick="phoneBookManager.deletePhone(${phone.id})">Delete</button>
           </div>
         </div>
       </div>

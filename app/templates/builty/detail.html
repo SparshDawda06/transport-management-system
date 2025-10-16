@@ -5,12 +5,21 @@
   <div class="detail-header">
     <div>
       <h1 class="detail-title">Builty #{{ builty.id }}</h1>
-      <p class="detail-subtitle">{{ builty.date.strftime('%B %d, %Y') }}</p>
+      <p class="detail-subtitle">{{ builty.date.strftime('%B %d, %Y at %I:%M %p') }}</p>
     </div>
     <div class="detail-actions">
-      <a href="{{ url_for('builty.edit_builty', builty_id=builty.id) }}" class="btn btn-primary">Edit</a>
-      <button onclick="deleteBuilty({{ builty.id }})" class="btn btn-secondary">Delete</button>
-      <a href="{{ url_for('builty.list_builty') }}" class="btn btn-secondary">Back to List</a>
+      <a href="{{ url_for('builty.edit_builty', builty_id=builty.id) }}" class="btn btn-primary">
+        <i class="fas fa-edit"></i> Edit
+      </a>
+      <button onclick="printBuilty()" class="btn btn-info">
+        <i class="fas fa-print"></i> Print
+      </button>
+      <button onclick="deleteBuilty({{ builty.id }})" class="btn btn-danger">
+        <i class="fas fa-trash"></i> Delete
+      </button>
+      <a href="{{ url_for('builty.list_builty') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to List
+      </a>
     </div>
   </div>
   
@@ -77,14 +86,32 @@
         <div class="detail-label">Vehicle</div>
         <div class="detail-value">{{ builty.vehicle.registration_number if builty.vehicle else 'Not specified' }}</div>
       </div>
+      {% if builty.vehicle and builty.vehicle.vehicle_type %}
+      <div class="detail-grid">
+        <div class="detail-label">Vehicle Type</div>
+        <div class="detail-value">{{ builty.vehicle.vehicle_type }}</div>
+      </div>
+      {% endif %}
       <div class="detail-grid">
         <div class="detail-label">Driver</div>
         <div class="detail-value">{{ builty.driver.name if builty.driver else 'Not specified' }}</div>
       </div>
+      {% if builty.driver and builty.driver.license_number %}
+      <div class="detail-grid">
+        <div class="detail-label">Driver License</div>
+        <div class="detail-value">{{ builty.driver.license_number }}</div>
+      </div>
+      {% endif %}
       <div class="detail-grid">
         <div class="detail-label">Owner</div>
         <div class="detail-value">{{ builty.owner.name if builty.owner else 'Not specified' }}</div>
       </div>
+      {% if builty.owner and builty.owner.phone %}
+      <div class="detail-grid">
+        <div class="detail-label">Owner Phone</div>
+        <div class="detail-value">{{ builty.owner.phone }}</div>
+      </div>
+      {% endif %}
     </div>
 
     <!-- Goods Information -->
@@ -130,7 +157,7 @@
 
 <script>
 function deleteBuilty(builtyId) {
-  if (confirm('Are you sure you want to delete this builty?')) {
+  if (confirm('Are you sure you want to delete this builty? This action cannot be undone.')) {
     fetch(`/builty/${builtyId}`, {
       method: 'DELETE',
       headers: {
@@ -140,16 +167,55 @@ function deleteBuilty(builtyId) {
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        window.location.href = '/builty';
+        TMS.showNotification('Builty deleted successfully', 'success');
+        setTimeout(() => {
+          window.location.href = '/builty';
+        }, 1500);
       } else {
-        alert('Error deleting builty');
+        TMS.showNotification(data.message || 'Error deleting builty', 'error');
       }
     })
     .catch(error => {
       console.error('Error:', error);
-      alert('Error deleting builty');
+      TMS.showNotification('Error deleting builty', 'error');
     });
   }
 }
+
+function printBuilty() {
+  // Add print-specific styling
+  const printStyles = document.createElement('style');
+  printStyles.textContent = `
+    @media print {
+      body * { visibility: hidden; }
+      .detail-container, .detail-container * { visibility: visible; }
+      .detail-container { position: absolute; left: 0; top: 0; width: 100%; }
+      .detail-actions { display: none !important; }
+    }
+  `;
+  document.head.appendChild(printStyles);
+  
+  // Print the page
+  window.print();
+  
+  // Remove the print styles after printing
+  setTimeout(() => {
+    document.head.removeChild(printStyles);
+  }, 1000);
+}
+
+// Add keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+  // Ctrl+P or Cmd+P for print
+  if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+    e.preventDefault();
+    printBuilty();
+  }
+  
+  // Escape key to go back
+  if (e.key === 'Escape') {
+    window.location.href = '/builty';
+  }
+});
 </script>
 {% endblock %}

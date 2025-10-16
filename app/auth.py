@@ -1,7 +1,10 @@
 import os
 import hashlib
+import logging
 from functools import wraps
 from flask import session, redirect, url_for, request, flash, render_template
+
+logger = logging.getLogger(__name__)
 
 def load_users():
     """Load users from users.txt file"""
@@ -14,8 +17,10 @@ def load_users():
                     if line and ':' in line:
                         username, password = line.split(':', 1)
                         users[username] = password
+        except (IOError, OSError) as e:
+            logger.error(f"Error loading users: {e}")
         except Exception as e:
-            print(f"Error loading users: {e}")
+            logger.error(f"Unexpected error loading users: {e}")
     return users
 
 def save_users(users):
@@ -25,8 +30,11 @@ def save_users(users):
             for username, password in users.items():
                 f.write(f"{username}:{password}\n")
         return True
+    except (IOError, OSError) as e:
+        logger.error(f"Error saving users: {e}")
+        return False
     except Exception as e:
-        print(f"Error saving users: {e}")
+        logger.error(f"Unexpected error saving users: {e}")
         return False
 
 def hash_password(password):
@@ -37,16 +45,17 @@ def verify_password(username, password):
     """Verify user credentials"""
     users = load_users()
     if username in users:
-        # For now, storing plain text passwords (you can enhance this later)
-        return users[username] == password
+        # Compare hashed passwords
+        hashed_password = hash_password(password)
+        return users[username] == hashed_password
     return False
 
 def create_default_user_if_not_exists():
     """Create default admin user if users.txt doesn't exist"""
     if not os.path.exists('users.txt'):
-        users = {'admin': 'admin123'}
+        users = {'admin': hash_password('admin123')}
         save_users(users)
-        print("[INFO] Default user created: admin/admin123")
+        logger.info("Default user created: admin/admin123")
 
 def login_required(f):
     """Decorator to require login for protected routes"""

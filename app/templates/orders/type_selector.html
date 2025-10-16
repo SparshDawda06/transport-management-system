@@ -16,14 +16,16 @@
       transition: all 0.3s ease;
       min-width: 200px;
       background: white;
-    " onmouseover="this.style.borderColor='#3b82f6'; this.style.transform='translateY(-2px)'" 
-       onmouseout="this.style.borderColor='#e5e7eb'; this.style.transform='translateY(0)'">
-      <div class="order-type-icon party-icon"></div>
+      position: relative;
+    " onmouseover="this.style.borderColor='#3b82f6'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.15)'" 
+       onmouseout="this.style.borderColor='#e5e7eb'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+      <div class="order-type-icon party-icon" style="width: 48px; height: 48px; margin: 0 auto 16px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">👥</div>
       <h3 style="margin: 0 0 10px 0; color: #1f2937;">Party Order</h3>
       <p style="margin: 0; color: #6b7280; font-size: 14px; line-height: 1.5;">
         Order placed directly by<br>
         <strong>Consignor & Consignee</strong>
       </p>
+      <div style="position: absolute; top: 12px; right: 12px; background: #10b981; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 500;">RECOMMENDED</div>
     </div>
     
     <!-- Agent Order Card -->
@@ -36,14 +38,16 @@
       transition: all 0.3s ease;
       min-width: 200px;
       background: white;
-    " onmouseover="this.style.borderColor='#3b82f6'; this.style.transform='translateY(-2px)'" 
-       onmouseout="this.style.borderColor='#e5e7eb'; this.style.transform='translateY(0)'">
-      <div class="order-type-icon agent-icon"></div>
+      position: relative;
+    " onmouseover="this.style.borderColor='#3b82f6'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.15)'" 
+       onmouseout="this.style.borderColor='#e5e7eb'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+      <div class="order-type-icon agent-icon" style="width: 48px; height: 48px; margin: 0 auto 16px; background: #8b5cf6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">🏢</div>
       <h3 style="margin: 0 0 10px 0; color: #1f2937;">Agent Order</h3>
       <p style="margin: 0; color: #6b7280; font-size: 14px; line-height: 1.5;">
         Order placed through a<br>
         <strong>Booking Agent</strong>
       </p>
+      <div style="position: absolute; top: 12px; right: 12px; background: #8b5cf6; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 500;">AGENT</div>
     </div>
   </div>
   
@@ -57,8 +61,17 @@
 document.addEventListener('DOMContentLoaded', function() {
   console.log('Order type selector page loaded');
   
-  // The initialization is now handled by the base template's Barba hooks
-  // This ensures proper reinitialization after page transitions
+  // Add click handlers to order type cards
+  const orderTypeCards = document.querySelectorAll('.order-type-card');
+  orderTypeCards.forEach(card => {
+    card.addEventListener('click', function() {
+      const orderType = this.getAttribute('data-type');
+      console.log('Selected order type:', orderType);
+      
+      // Redirect to order creation with the selected type
+      window.location.href = `{{ url_for('orders.create_order') }}?type=${orderType}`;
+    });
+  });
 });
 </script>
 {% endblock %}

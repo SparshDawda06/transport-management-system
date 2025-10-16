@@ -3,6 +3,7 @@ from datetime import date
 from ..extensions import db
 from ..models import Builty, Order, Vehicle, Driver, Owner, Station, Goods, TransactionLog, Consignor, Consignee, BookingAgent
 from ..forms import BuiltyForm
+from ..auth import login_required
 
 bp = Blueprint("builty", __name__, url_prefix="/builty")
 
@@ -22,6 +23,7 @@ def _choices():
 
 
 @bp.route("/")
+@login_required
 def list_builty():
     # Filter by status if provided
     status_filter = request.args.get('status', 'all')
@@ -74,6 +76,7 @@ def list_builty():
 
 
 @bp.route("/new", methods=["GET", "POST"])
+@login_required
 def create_builty():
     form = BuiltyForm()
     
@@ -91,9 +94,11 @@ def create_builty():
     form.booking_agent_id.choices = [(0, 'Select Agent')] + choices['agents']
     
     # Debug: Check if all fields have choices
+    import logging
+    logger = logging.getLogger(__name__)
     for field_name, field in form._fields.items():
         if hasattr(field, 'choices') and field.choices is None:
-            print(f"Field {field_name} has no choices")
+            logger.warning(f"Field {field_name} has no choices")
     
     if not form.date.data:
         form.date.data = date.today()
@@ -143,7 +148,7 @@ def create_builty():
     # Custom validation for required fields
     validation_errors = []
     
-    # Check required fields that need valid IDs (not 0)
+    # Check required fields that need valid IDs (not None)
     required_fields = [
         ('order_id', 'Order'),
         ('vehicle_id', 'Vehicle'), 
@@ -154,7 +159,7 @@ def create_builty():
     ]
     
     for field_name, field_label in required_fields:
-        if getattr(form, field_name).data == 0:
+        if getattr(form, field_name).data is None:
             validation_errors.append(f"{field_label} is required")
             getattr(form, field_name).errors.append(f"{field_label} is required")
     
@@ -162,6 +167,16 @@ def create_builty():
     if not form.date.data:
         validation_errors.append("Date is required")
         form.date.errors.append("Date is required")
+    
+    # Check if order exists and is not already dispatched
+    if form.order_id.data is not None:
+        order = Order.query.get(form.order_id.data)
+        if not order:
+            validation_errors.append("Selected order does not exist")
+            form.order_id.errors.append("Selected order does not exist")
+        elif order.status == 'DISPATCHED':
+            validation_errors.append("Selected order is already dispatched")
+            form.order_id.errors.append("Selected order is already dispatched")
     
     if not validation_errors and form.validate_on_submit():
         try:
@@ -227,7 +242,10 @@ def create_builty():
         except Exception as e:
             db.session.rollback()
             flash(f"Error creating builty: {str(e)}", "error")
-            print(f"Builty creation error: {str(e)}")  # Debug log
+            # Log error for debugging
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Builty creation error: {str(e)}")
             
             # Handle AJAX requests differently
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -253,6 +271,7 @@ def create_builty():
 
 
 @bp.route("/<int:builty_id>/view")
+@login_required
 def view_builty(builty_id):
     builty = Builty.query.options(
         db.joinedload(Builty.order),
@@ -269,7 +288,22 @@ def view_builty(builty_id):
     return render_template("builty/detail.html", builty=builty)
 
 
+@bp.route("/<int:builty_id>", methods=["DELETE"])
+@login_required
+def delete_builty(builty_id):
+    builty = Builty.query.get_or_404(builty_id)
+    
+    try:
+        db.session.delete(builty)
+        db.session.commit()
+        return jsonify({"success": True, "message": "Builty deleted successfully"})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": f"Error deleting builty: {str(e)}"}), 500
+
+
 @bp.route("/<int:builty_id>/edit", methods=["GET", "POST"])
+@login_required
 def edit_builty(builty_id):
     builty = Builty.query.get_or_404(builty_id)
     form = BuiltyForm(obj=builty)
@@ -367,5 +401,6 @@ def edit_builty(builty_id):
 
 
 @bp.post("/from-order/<int:order_id>")
+@login_required
 def create_from_order(order_id):
     return redirect(url_for("builty.create_builty") + f"?order_id={order_id}")

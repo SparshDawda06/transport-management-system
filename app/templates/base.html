@@ -154,6 +154,7 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/relationship-logic.js') }}"></script>
     <script>
         function toggleNavbar() {
             const navbar = document.getElementById('navbarCollapse');
@@ -177,6 +178,14 @@
                 const dropdown = this.parentElement;
                 dropdown.classList.toggle('show');
             });
+        });
+
+        // Initialize TMS functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof TMS !== 'undefined') {
+                TMS.initNavbar();
+                console.log('TMS functionality initialized');
+            }
         });
     </script>
 </body>

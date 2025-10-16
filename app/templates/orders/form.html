@@ -15,18 +15,53 @@
         Basic Information
       </h3>
       <div class="form-row">
-        <div class="field">{{ form.date.label }}{{ form.date() }}</div>
-        <div class="field">{{ form.firm.label }}{{ form.firm() }}</div>
+        <div class="field">
+          {{ form.date.label }}{{ form.date() }}
+          {% if form.date.errors %}
+            <div class="form-error">
+              {% for error in form.date.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+        <div class="field">
+          {{ form.firm.label }}{{ form.firm() }}
+          {% if form.firm.errors %}
+            <div class="form-error">
+              {% for error in form.firm.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
       </div>
       <div class="form-row">
-        <div class="field">{{ form.status.label }}{{ form.status() }}</div>
+        <div class="field">
+          {{ form.status.label }}{{ form.status() }}
+          {% if form.status.errors %}
+            <div class="form-error">
+              {% for error in form.status.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
         <div class="field">
           <label>Order Type</label>
           <div style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #f3f4f6; border-radius: 6px; border: 1px solid #d1d5db;">
             <span id="order_type_display" style="font-weight: 500; color: #1f2937;"></span>
             <span style="font-size: 12px; color: #6b7280;">({{ form.order_type.data }})</span>
+            <button type="button" id="toggle_order_type" style="margin-left: auto; padding: 4px 8px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Change</button>
           </div>
-          {{ form.order_type() }}
+          {{ form.order_type(style="display: none;") }}
+          {% if form.order_type.errors %}
+            <div class="form-error">
+              {% for error in form.order_type.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -40,8 +75,26 @@
         Route Information
       </h3>
       <div class="form-row">
-        <div class="field">{{ form.from_station_id.label }}{{ form.from_station_id() }}</div>
-        <div class="field">{{ form.to_station_id.label }}{{ form.to_station_id() }}</div>
+        <div class="field">
+          {{ form.from_station_id.label }}{{ form.from_station_id() }}
+          {% if form.from_station_id.errors %}
+            <div class="form-error">
+              {% for error in form.from_station_id.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+        <div class="field">
+          {{ form.to_station_id.label }}{{ form.to_station_id() }}
+          {% if form.to_station_id.errors %}
+            <div class="form-error">
+              {% for error in form.to_station_id.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
       </div>
     </div>
     
@@ -55,13 +108,40 @@
       </h3>
       <div class="form-row">
         <div class="field-with-add">
-          <div class="field">{{ form.goods_id.label }}{{ form.goods_id(id='goods_id') }}</div>
+          <div class="field">
+            {{ form.goods_id.label }}{{ form.goods_id(id='goods_id') }}
+            {% if form.goods_id.errors %}
+              <div class="form-error">
+                {% for error in form.goods_id.errors %}
+                  <div>{{ error }}</div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
           <button type="button" class="icon-add" title="Add Goods" onclick="TMS.openInline('goods')">+</button>
         </div>
       </div>
       <div class="form-row">
-        <div class="field">{{ form.weight.label }}{{ form.weight(id='weight') }}</div>
-        <div class="field">{{ form.rate.label }}{{ form.rate(id='rate') }}</div>
+        <div class="field">
+          {{ form.weight.label }}{{ form.weight(id='weight') }}
+          {% if form.weight.errors %}
+            <div class="form-error">
+              {% for error in form.weight.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+        <div class="field">
+          {{ form.rate.label }}{{ form.rate(id='rate') }}
+          {% if form.rate.errors %}
+            <div class="form-error">
+              {% for error in form.rate.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
       </div>
       <div class="form-row">
         <div class="field">
@@ -70,7 +150,16 @@
         </div>
       </div>
       <div class="form-row">
-        <div class="field">{{ form.description.label }}{{ form.description() }}</div>
+        <div class="field">
+          {{ form.description.label }}{{ form.description() }}
+          {% if form.description.errors %}
+            <div class="form-error">
+              {% for error in form.description.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
       </div>
     </div>
     
@@ -81,6 +170,7 @@
           <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"></path>
         </svg>
         Party Information
+        <span id="party_status" class="section-status" style="margin-left: auto; padding: 4px 8px; background: #10b981; color: white; border-radius: 12px; font-size: 12px; font-weight: 500;">ACTIVE</span>
       </h3>
       
       <!-- Consignor Subsection -->
@@ -93,7 +183,16 @@
         </h4>
         <div class="form-row">
           <div class="field-with-add">
-            <div class="field">{{ form.consignor_id.label }}{{ form.consignor_id(id='consignor_id') }}</div>
+            <div class="field">
+              {{ form.consignor_id.label }}{{ form.consignor_id(id='consignor_id') }}
+              {% if form.consignor_id.errors %}
+                <div class="form-error">
+                  {% for error in form.consignor_id.errors %}
+                    <div>{{ error }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
             <button type="button" class="icon-add" title="Add Consignor" onclick="TMS.openInline('consignors')">+</button>
           </div>
         </div>
@@ -129,7 +228,16 @@
         </h4>
         <div class="form-row">
           <div class="field-with-add">
-            <div class="field">{{ form.consignee_id.label }}{{ form.consignee_id(id='consignee_id') }}</div>
+            <div class="field">
+              {{ form.consignee_id.label }}{{ form.consignee_id(id='consignee_id') }}
+              {% if form.consignee_id.errors %}
+                <div class="form-error">
+                  {% for error in form.consignee_id.errors %}
+                    <div>{{ error }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
             <button type="button" class="icon-add" title="Add Consignee" onclick="TMS.openInline('consignees')">+</button>
           </div>
         </div>
@@ -163,10 +271,20 @@
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"></path>
           </svg>
           Booking Agent Details
+          <span id="agent_status" class="section-status" style="margin-left: auto; padding: 4px 8px; background: #6b7280; color: white; border-radius: 12px; font-size: 12px; font-weight: 500;">INACTIVE</span>
         </h4>
       <div class="form-row">
         <div class="field-with-add">
-          <div class="field">{{ form.booking_agent_id.label }}{{ form.booking_agent_id(id='booking_agent_id') }}</div>
+          <div class="field">
+            {{ form.booking_agent_id.label }}{{ form.booking_agent_id(id='booking_agent_id') }}
+            {% if form.booking_agent_id.errors %}
+              <div class="form-error">
+                {% for error in form.booking_agent_id.errors %}
+                  <div>{{ error }}</div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
           <button type="button" class="icon-add" title="Add Agent" onclick="TMS.openInline('booking_agents')">+</button>
         </div>
         <div class="field-with-add">
@@ -255,12 +373,20 @@ TMS.inlineSaved = async function(entity, id, label){
       const option = Array.from(sel.options).find(opt => opt.value == id);
       if(option){
         sel.value = id;
+        // Trigger change event for entity relationships
+        if (['consignors', 'consignees', 'booking_agents'].includes(entity)) {
+          sel.dispatchEvent(new Event('change'));
+        }
       } else {
         const newOpt = document.createElement('option');
         newOpt.value = id;
         newOpt.textContent = label;
         newOpt.selected = true;
         sel.appendChild(newOpt);
+        // Trigger change event for new options
+        if (['consignors', 'consignees', 'booking_agents'].includes(entity)) {
+          sel.dispatchEvent(new Event('change'));
+        }
       }
     }
   });
@@ -286,21 +412,58 @@ TMS.inlineSaved = async function(entity, id, label){
     const orderType = orderTypeSelect.value;
     console.log('Setting order type display for:', orderType);
     
+    // Get status indicators
+    const partyStatus = document.getElementById('party_status');
+    const agentStatus = document.getElementById('agent_status');
+    
     if(orderType === 'PARTY'){
       partySection.style.display = 'block';
       agentSection.style.display = 'none';
       orderTypeDisplay.textContent = 'Party Order (Consignor & Consignee)';
+      
+      // Update status indicators
+      if (partyStatus) {
+        partyStatus.textContent = 'ACTIVE';
+        partyStatus.style.background = '#10b981';
+      }
+      if (agentStatus) {
+        agentStatus.textContent = 'INACTIVE';
+        agentStatus.style.background = '#6b7280';
+      }
+      
       console.log('Displaying Party section');
     } else if(orderType === 'AGENT'){
       partySection.style.display = 'none';
       agentSection.style.display = 'block';
       orderTypeDisplay.textContent = 'Agent Order (Booking Agent)';
+      
+      // Update status indicators
+      if (partyStatus) {
+        partyStatus.textContent = 'INACTIVE';
+        partyStatus.style.background = '#6b7280';
+      }
+      if (agentStatus) {
+        agentStatus.textContent = 'ACTIVE';
+        agentStatus.style.background = '#10b981';
+      }
+      
       console.log('Displaying Agent section');
     } else {
       // Default to party if no type set
       partySection.style.display = 'block';
       agentSection.style.display = 'none';
       orderTypeDisplay.textContent = 'Party Order (Consignor & Consignee)';
+      
+      // Update status indicators
+      if (partyStatus) {
+        partyStatus.textContent = 'ACTIVE';
+        partyStatus.style.background = '#10b981';
+      }
+      if (agentStatus) {
+        agentStatus.textContent = 'INACTIVE';
+        agentStatus.style.background = '#6b7280';
+      }
+      
       console.log('Defaulting to Party section');
     }
   }
@@ -308,11 +471,43 @@ TMS.inlineSaved = async function(entity, id, label){
   // Initialize display on load
   setTimeout(setOrderTypeDisplay, 100);
   
+  // Add change event listener
+  if (orderTypeSelect) {
+    orderTypeSelect.addEventListener('change', setOrderTypeDisplay);
+  }
+  
+  // Add toggle button functionality
+  const toggleButton = document.getElementById('toggle_order_type');
+  if (toggleButton) {
+    toggleButton.addEventListener('click', function() {
+      const currentType = orderTypeSelect.value;
+      const newType = currentType === 'PARTY' ? 'AGENT' : 'PARTY';
+      
+      // Update the hidden select field
+      orderTypeSelect.value = newType;
+      
+      // Update the display
+      setOrderTypeDisplay();
+      
+      // Show a brief confirmation
+      const originalText = this.textContent;
+      this.textContent = 'Changed!';
+      this.style.background = '#10b981';
+      setTimeout(() => {
+        this.textContent = originalText;
+        this.style.background = '#3b82f6';
+      }, 1000);
+    });
+  }
+  
   // Make function globally available for Barba reinitialization
   window.setOrderTypeDisplay = setOrderTypeDisplay;
 })();
 
-// Bidirectional linking: From Station ↔ Consignor, To Station ↔ Consignee, From Station ↔ Agent
+// Order form now uses unified relationship logic from relationship-logic.js
+// The TMSRelationshipManager will automatically initialize for order forms
+
+// Legacy relationship logic (kept for compatibility)
 (function(){
   const fromStationSelect = document.getElementById('from_station_id');
   const toStationSelect = document.getElementById('to_station_id');
@@ -625,6 +820,19 @@ TMS.inlineSaved = async function(entity, id, label){
     });
   }
 
+  // When agent changes, load concerned persons
+  if(agentSelect) {
+    agentSelect.addEventListener('change', function() {
+      const agentId = this.value;
+      if(agentId && agentId !== '0') {
+        loadConcernedPersons('agent', agentId);
+      } else {
+        clearConcernedPersonDropdown('agent');
+        clearPhoneDropdown('agent');
+      }
+    });
+  }
+
   // When consignor concerned person changes, load phone numbers
   if(consignorConcernedPersonSelect) {
     consignorConcernedPersonSelect.addEventListener('change', function() {
@@ -649,26 +857,51 @@ TMS.inlineSaved = async function(entity, id, label){
     });
   }
 
+  // When agent concerned person changes, load phone numbers
+  const agentConcernedPersonSelect = document.getElementById('agent_concerned_person');
+  if(agentConcernedPersonSelect) {
+    agentConcernedPersonSelect.addEventListener('change', function() {
+      const personId = this.value;
+      if(personId) {
+        loadPhoneNumbers('agent', personId);
+      } else {
+        clearPhoneDropdown('agent');
+      }
+    });
+  }
+
 
   async function loadConcernedPersons(entityType, entityId) {
     try {
       const response = await fetch(`/phonebook/api/concerned-persons/${entityType.toUpperCase()}/${entityId}`);
       const persons = await response.json();
       
-      const select = entityType === 'consignor' ? consignorConcernedPersonSelect : consigneeConcernedPersonSelect;
-      select.innerHTML = '<option value="">Select concerned person...</option>';
+      let select;
+      if (entityType === 'consignor') {
+        select = consignorConcernedPersonSelect;
+      } else if (entityType === 'consignee') {
+        select = consigneeConcernedPersonSelect;
+      } else if (entityType === 'agent') {
+        select = document.getElementById('agent_concerned_person');
+      }
       
-      persons.forEach(person => {
-        const option = document.createElement('option');
-        option.value = person.id;
-        option.textContent = `${person.name}${person.designation ? ` (${person.designation})` : ''}${person.is_primary ? ' - PRIMARY CONTACT' : ''}`;
-        option.setAttribute('title', `${person.name}${person.designation ? ` - ${person.designation}` : ''}${person.is_primary ? ' - Primary Contact Person' : ''}`);
-        if (person.is_primary) {
-          option.selected = true;
-          loadPhoneNumbers(entityType, person.id); // Auto-load phone numbers for primary person
-        }
-        select.appendChild(option);
-      });
+      if (select) {
+        select.innerHTML = '<option value="">Select concerned person...</option>';
+      }
+      
+      if (select) {
+        persons.forEach(person => {
+          const option = document.createElement('option');
+          option.value = person.id;
+          option.textContent = `${person.name}${person.designation ? ` (${person.designation})` : ''}${person.is_primary ? ' - PRIMARY CONTACT' : ''}`;
+          option.setAttribute('title', `${person.name}${person.designation ? ` - ${person.designation}` : ''}${person.is_primary ? ' - Primary Contact Person' : ''}`);
+          if (person.is_primary) {
+            option.selected = true;
+            loadPhoneNumbers(entityType, person.id); // Auto-load phone numbers for primary person
+          }
+          select.appendChild(option);
+        });
+      }
     } catch (error) {
       console.error('Error loading concerned persons:', error);
     }
@@ -679,38 +912,75 @@ TMS.inlineSaved = async function(entity, id, label){
       const response = await fetch(`/phonebook/api/phone-numbers/${concernedPersonId}`);
       const phones = await response.json();
       
-      const select = entityType === 'consignor' ? consignorPhoneSelect : consigneePhoneSelect;
-      select.innerHTML = '<option value="">Select phone number...</option>';
+      let select;
+      if (entityType === 'consignor') {
+        select = consignorPhoneSelect;
+      } else if (entityType === 'consignee') {
+        select = consigneePhoneSelect;
+      } else if (entityType === 'agent') {
+        select = document.getElementById('agent_phone_number');
+      }
       
-      phones.forEach(phone => {
-        const option = document.createElement('option');
-        option.value = phone.id;
-        option.textContent = `${phone.phone_number} - ${phone.label}${phone.is_primary ? ' (PRIMARY)' : ''}`;
-        option.setAttribute('data-phone-number', phone.phone_number);
-        if (phone.is_primary) {
-          option.selected = true;
-        }
-        select.appendChild(option);
-      });
+      if (select) {
+        select.innerHTML = '<option value="">Select phone number...</option>';
+        
+        phones.forEach(phone => {
+          const option = document.createElement('option');
+          option.value = phone.id;
+          option.textContent = `${phone.phone_number} - ${phone.label}${phone.is_primary ? ' (PRIMARY)' : ''}`;
+          option.setAttribute('data-phone-number', phone.phone_number);
+          if (phone.is_primary) {
+            option.selected = true;
+          }
+          select.appendChild(option);
+        });
+      }
     } catch (error) {
       console.error('Error loading phone numbers:', error);
     }
   }
 
   function clearConcernedPersonDropdown(entityType) {
-    const select = entityType === 'consignor' ? consignorConcernedPersonSelect : consigneeConcernedPersonSelect;
-    select.innerHTML = '<option value="">Select concerned person...</option>';
+    let select;
+    if (entityType === 'consignor') {
+      select = consignorConcernedPersonSelect;
+    } else if (entityType === 'consignee') {
+      select = consigneeConcernedPersonSelect;
+    } else if (entityType === 'agent') {
+      select = document.getElementById('agent_concerned_person');
+    }
+    
+    if (select) {
+      select.innerHTML = '<option value="">Select concerned person...</option>';
+    }
   }
 
   function clearPhoneDropdown(entityType) {
-    const select = entityType === 'consignor' ? consignorPhoneSelect : consigneePhoneSelect;
-    select.innerHTML = '<option value="">Select phone number...</option>';
+    let select;
+    if (entityType === 'consignor') {
+      select = consignorPhoneSelect;
+    } else if (entityType === 'consignee') {
+      select = consigneePhoneSelect;
+    } else if (entityType === 'agent') {
+      select = document.getElementById('agent_phone_number');
+    }
+    
+    if (select) {
+      select.innerHTML = '<option value="">Select phone number...</option>';
+    }
   }
 
 
   // Global functions for buttons
   window.addConcernedPerson = function(entityType) {
-    const entitySelect = entityType === 'consignor' ? consignorSelect : consigneeSelect;
+    let entitySelect;
+    if (entityType === 'consignor') {
+      entitySelect = consignorSelect;
+    } else if (entityType === 'consignee') {
+      entitySelect = consigneeSelect;
+    } else if (entityType === 'agent') {
+      entitySelect = agentSelect;
+    }
     const entityId = entitySelect ? entitySelect.value : null;
     
     if (!entityId || entityId === '0') {
@@ -751,7 +1021,14 @@ TMS.inlineSaved = async function(entity, id, label){
   };
 
   window.addPhoneNumber = function(entityType) {
-    const concernedPersonSelect = entityType === 'consignor' ? consignorConcernedPersonSelect : consigneeConcernedPersonSelect;
+    let concernedPersonSelect;
+    if (entityType === 'consignor') {
+      concernedPersonSelect = consignorConcernedPersonSelect;
+    } else if (entityType === 'consignee') {
+      concernedPersonSelect = consigneeConcernedPersonSelect;
+    } else if (entityType === 'agent') {
+      concernedPersonSelect = document.getElementById('agent_concerned_person');
+    }
     const concernedPersonId = concernedPersonSelect ? concernedPersonSelect.value : null;
     
     if (!concernedPersonId) {
@@ -794,7 +1071,14 @@ TMS.inlineSaved = async function(entity, id, label){
   };
 
   window.manageEntityPhones = function(entityType) {
-    const entitySelect = entityType === 'consignor' ? consignorSelect : consigneeSelect;
+    let entitySelect;
+    if (entityType === 'consignor') {
+      entitySelect = consignorSelect;
+    } else if (entityType === 'consignee') {
+      entitySelect = consigneeSelect;
+    } else if (entityType === 'agent') {
+      entitySelect = agentSelect;
+    }
     const entityId = entitySelect ? entitySelect.value : null;
     
     if (!entityId || entityId === '0') {
