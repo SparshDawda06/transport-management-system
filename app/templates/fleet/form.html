@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Owner{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>{{ 'New Owner' if mode=='create' else 'Edit Owner' }}</h2>
+  <form method="post">{{ form.csrf_token }}
+    <div class="form-row">
+      <div class="field">{{ form.name.label }}{{ form.name() }}</div>
+      <div class="field">{{ form.phone.label }}{{ form.phone() }}</div>
+    </div>
+    <div class="form-row">
+      <div class="field">{{ form.pan.label }}{{ form.pan() }}</div>
+      <div class="field">{{ form.aadhar.label }}{{ form.aadhar() }}</div>
+    </div>
+    <div class="field">{{ form.address.label }}{{ form.address() }}</div>
+    <button class="btn" type="submit">Save</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% block title %}Orders - TMS{% endblock %}
+{% block content %}
+  <!-- Page Header -->
+  <div class="page-header-fixed">
+    <h1 class="page-title">Orders</h1>
+    <div class="header-controls">
+      <div class="filter-group">
+        <a href="?status=active" class="filter-btn {{ 'active' if status_filter == 'active' else '' }}">Active</a>
+        <a href="?status=dispatched" class="filter-btn {{ 'active' if status_filter == 'dispatched' else '' }}">Dispatched</a>
+        <a href="?status=all" class="filter-btn {{ 'active' if status_filter == 'all' else '' }}">All</a>
+      </div>
+      <a href="{{ url_for('orders.create_order') }}" class="btn btn-primary new-btn">New Order</a>
+    </div>
+  </div>
+
+  <!-- PARTY Orders Table -->
+  <div class="table-container">
+    <div class="table-header">
+      <div class="table-title">
+        <span class="status-badge status-active">PARTY</span>
+        <h3>Party Orders</h3>
+      </div>
+      <div class="table-actions">
+        <span class="table-count">{{ party_orders|length }} orders</span>
+      </div>
+    </div>
+    
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Firm</th>
+          <th>Type</th>
+          <th>Consignor</th>
+          <th>Consignee</th>
+          <th>To Station</th>
+          <th>Goods</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in party_orders %}
+        <tr>
+          <td>{{ order.date.strftime('%b %d, %Y') }}</td>
+          <td>
+            <div style="display: flex; align-items: center; gap: var(--space-2);">
+              <div class="product-avatar">{{ order.firm[:2].upper() if order.firm else 'NJ' }}</div>
+              <span>{{ order.firm if order.firm else 'New Jalaram Transport Service' }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="status-badge status-active">Party</span>
+          </td>
+          <td>
+            {% if order.consignor %}
+              {{ order.consignor.name }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>
+            {% if order.consignee %}
+              {{ order.consignee.name }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>
+            {% if order.to_station %}
+              {{ order.to_station.name }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>
+            {% if order.goods %}
+              {{ order.goods.description }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>
+            {% if order.status == 'confirmed' %}
+              <span class="status-badge status-active">Active</span>
+            {% elif order.status == 'dispatched' %}
+              <span class="status-badge status-pending">Dispatched</span>
+            {% else %}
+              <span class="status-badge status-inactive">Inactive</span>
+            {% endif %}
+          </td>
+          <td>
+            <button class="action-btn" onclick="viewOrder({{ order.id }})">⋯</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- AGENT Orders Table -->
+  <div class="table-container">
+    <div class="table-header">
+      <div class="table-title">
+        <span class="status-badge status-info">AGENT</span>
+        <h3>Agent Orders</h3>
+      </div>
+      <div class="table-actions">
+        <span class="table-count">{{ agent_orders|length }} orders</span>
+      </div>
+    </div>
+    
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Firm</th>
+          <th>Type</th>
+          <th>Consignor</th>
+          <th>Consignee</th>
+          <th>To Station</th>
+          <th>Goods</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in agent_orders %}
+        <tr>
+          <td>{{ order.date.strftime('%b %d, %Y') }}</td>
+          <td>
+            <div style="display: flex; align-items: center; gap: var(--space-2);">
+              <div class="product-avatar">{{ order.firm[:2].upper() if order.firm else 'JT' }}</div>
+              <span>{{ order.firm if order.firm else 'Jayshree Transport Service' }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="status-badge status-on-sale">Agent</span>
+          </td>
+          <td>
+            {% if order.consignor %}
+              {{ order.consignor.name }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>
+            {% if order.consignee %}
+              {{ order.consignee.name }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>
+            {% if order.to_station %}
+              {{ order.to_station.name }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>
+            {% if order.goods %}
+              {{ order.goods.description }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>
+            {% if order.status == 'confirmed' %}
+              <span class="status-badge status-active">Active</span>
+            {% elif order.status == 'dispatched' %}
+              <span class="status-badge status-pending">Dispatched</span>
+            {% else %}
+              <span class="status-badge status-inactive">Inactive</span>
+            {% endif %}
+          </td>
+          <td>
+            <button class="action-btn" onclick="viewOrder({{ order.id }})">⋯</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if not party_orders and not agent_orders %}
+  <div style="text-align: center; padding: var(--space-16); color: var(--text-secondary);">
+    <div class="empty-state-icon orders-icon"></div>
+    <h3 style="color: var(--text-primary); margin-bottom: var(--space-2);">No orders found</h3>
+    <p style="margin-bottom: var(--space-6);">Create your first order to get started.</p>
+    <a href="{{ url_for('orders.create_order') }}" class="btn btn-primary">New Order</a>
+  </div>
+  {% endif %}
+
+
+<script>
+function viewOrder(orderId) {
+  window.location.href = `/orders/${orderId}/view`;
+}
+
+function deleteOrder(orderId) {
+  if (confirm('Are you sure you want to delete this order?')) {
+    fetch(`/orders/${orderId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert('Error deleting order');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error deleting order');
+    });
+  }
+}
+</script>
+{% endblock %}

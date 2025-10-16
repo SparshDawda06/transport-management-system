@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}User Management{% endblock %}
+{% block content %}
+<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div>
+            <h2>User Management</h2>
+            <p style="color: #666; margin: 8px 0 0 0;">Manage system users</p>
+        </div>
+        <a href="{{ url_for('main.index') }}" class="btn secondary">← Back to Dashboard</a>
+    </div>
+    
+    <!-- Add User Form -->
+    <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <h3 style="margin-bottom: 16px;">Add New User</h3>
+        <form method="POST" action="{{ url_for('auth.add_user') }}" style="display: flex; gap: 12px; align-items: end;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div style="flex: 1;">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required 
+                       style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border);"
+                       placeholder="Enter username">
+            </div>
+            <div style="flex: 1;">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required 
+                       style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border);"
+                       placeholder="Enter password">
+            </div>
+            <button type="submit" class="btn">Add User</button>
+        </form>
+    </div>
+    
+    <!-- Users List -->
+    <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+        <div style="background: #f9fafb; padding: 12px 16px; border-bottom: 1px solid #e5e7eb; font-weight: 600;">
+            Current Users
+        </div>
+        {% for username in users %}
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid #f3f4f6;">
+            <div>
+                <strong>{{ username }}</strong>
+                {% if username == 'admin' %}
+                <span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px;">ADMIN</span>
+                {% endif %}
+            </div>
+            {% if username != 'admin' %}
+            <button onclick="deleteUser('{{ username }}')" 
+                    style="background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                Delete
+            </button>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function deleteUser(username) {
+    if (confirm(`Are you sure you want to delete user "${username}"?`)) {
+        window.location.href = `/auth/delete-user/${username}`;
+    }
+}
+</script>
+{% endblock %}

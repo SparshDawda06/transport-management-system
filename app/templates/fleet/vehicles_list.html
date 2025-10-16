@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Vehicles - TMS{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Vehicles</h1>
+    <a href="{{ url_for('fleet.create_vehicle') }}" class="btn btn-primary">Add Vehicle</a>
+</div>
+
+<div class="card">
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Lorry No</th>
+                    <th>Capacity</th>
+                    <th>Owner</th>
+                    <th>Driver</th>
+                    <th>Chassis No</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.lorry_no }}</td>
+                    <td>{{ item.capacity or '-' }}</td>
+                    <td>{{ item.owner.name if item.owner else '-' }}</td>
+                    <td>{{ item.driver.name if item.driver else '-' }}</td>
+                    <td>{{ item.chassis_no or '-' }}</td>
+                    <td>
+                        <a href="{{ url_for('fleet.edit_vehicle', item_id=item.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

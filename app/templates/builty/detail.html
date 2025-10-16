@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% block title %}Builty Details - TMS{% endblock %}
+{% block content %}
+<div class="detail-container">
+  <div class="detail-header">
+    <div>
+      <h1 class="detail-title">Builty #{{ builty.id }}</h1>
+      <p class="detail-subtitle">{{ builty.date.strftime('%B %d, %Y') }}</p>
+    </div>
+    <div class="detail-actions">
+      <a href="{{ url_for('builty.edit_builty', builty_id=builty.id) }}" class="btn btn-primary">Edit</a>
+      <button onclick="deleteBuilty({{ builty.id }})" class="btn btn-secondary">Delete</button>
+      <a href="{{ url_for('builty.list_builty') }}" class="btn btn-secondary">Back to List</a>
+    </div>
+  </div>
+  
+  <div class="detail-content">
+    <!-- Basic Information -->
+    <div class="detail-section">
+      <h2 class="detail-section-title">Basic Information</h2>
+      <div class="detail-grid">
+        <div class="detail-label">Builty ID</div>
+        <div class="detail-value">{{ builty.id }}</div>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-label">Date</div>
+        <div class="detail-value">{{ builty.date.strftime('%B %d, %Y') }}</div>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-label">Firm</div>
+        <div class="detail-value">{{ builty.firm or 'Not specified' }}</div>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-label">LR Number</div>
+        <div class="detail-value">{{ builty.lr_no or 'Not specified' }}</div>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-label">Status</div>
+        <div class="detail-value">
+          <span class="status-badge {{ 'status-pending' if builty.status == 'in_transit' else 'status-active' if builty.status == 'delivered' else 'status-inactive' }}">
+            {{ builty.status.title().replace('_', ' ') }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Route Information -->
+    <div class="detail-section">
+      <h2 class="detail-section-title">Route Information</h2>
+      <div class="detail-grid">
+        <div class="detail-label">From Station</div>
+        <div class="detail-value">{{ builty.from_station.name if builty.from_station else 'Not specified' }}</div>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-label">To Station</div>
+        <div class="detail-value">{{ builty.to_station.name if builty.to_station else 'Not specified' }}</div>
+      </div>
+    </div>
+
+    <!-- Party Information -->
+    <div class="detail-section">
+      <h2 class="detail-section-title">Party Information</h2>
+      <div class="detail-grid">
+        <div class="detail-label">Consignor</div>
+        <div class="detail-value">{{ builty.consignor.name if builty.consignor else 'Not specified' }}</div>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-label">Consignee</div>
+        <div class="detail-value">{{ builty.consignee.name if builty.consignee else 'Not specified' }}</div>
+      </div>
+    </div>
+
+    <!-- Transport Information -->
+    <div class="detail-section">
+      <h2 class="detail-section-title">Transport Information</h2>
+      <div class="detail-grid">
+        <div class="detail-label">Vehicle</div>
+        <div class="detail-value">{{ builty.vehicle.registration_number if builty.vehicle else 'Not specified' }}</div>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-label">Driver</div>
+        <div class="detail-value">{{ builty.driver.name if builty.driver else 'Not specified' }}</div>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-label">Owner</div>
+        <div class="detail-value">{{ builty.owner.name if builty.owner else 'Not specified' }}</div>
+      </div>
+    </div>
+
+    <!-- Goods Information -->
+    <div class="detail-section">
+      <h2 class="detail-section-title">Goods Information</h2>
+      <div class="detail-grid">
+        <div class="detail-label">Goods</div>
+        <div class="detail-value">{{ builty.goods.name if builty.goods else 'Not specified' }}</div>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-label">Actual Weight</div>
+        <div class="detail-value">{{ builty.actual_weight or 'Not specified' }} kg</div>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-label">Rate</div>
+        <div class="detail-value">₹{{ builty.rate or 'Not specified' }}</div>
+      </div>
+    </div>
+
+    <!-- Financial Information -->
+    <div class="detail-section">
+      <h2 class="detail-section-title">Financial Information</h2>
+      <div class="detail-grid">
+        <div class="detail-label">Total Amount</div>
+        <div class="detail-value">₹{{ (builty.actual_weight * builty.rate) if builty.actual_weight and builty.rate else 'Not calculated' }}</div>
+      </div>
+    </div>
+
+    <!-- Related Order -->
+    {% if builty.order %}
+    <div class="detail-section">
+      <h2 class="detail-section-title">Related Order</h2>
+      <div class="detail-grid">
+        <div class="detail-label">Order ID</div>
+        <div class="detail-value">
+          <a href="{{ url_for('orders.view_order', order_id=builty.order.id) }}">Order #{{ builty.order.id }}</a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+function deleteBuilty(builtyId) {
+  if (confirm('Are you sure you want to delete this builty?')) {
+    fetch(`/builty/${builtyId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        window.location.href = '/builty';
+      } else {
+        alert('Error deleting builty');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error deleting builty');
+    });
+  }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% block title %}Builty - TMS{% endblock %}
+{% block content %}
+  <!-- Page Header -->
+  <div class="page-header-fixed">
+    <h1 class="page-title">Builty</h1>
+    <div class="header-controls">
+      <div class="filter-group">
+        <a href="?status=in_transit" class="filter-btn {{ 'active' if status_filter == 'in_transit' else '' }}">In Transit</a>
+        <a href="?status=delivered" class="filter-btn {{ 'active' if status_filter == 'delivered' else '' }}">Delivered</a>
+        <a href="?status=all" class="filter-btn {{ 'active' if status_filter == 'all' else '' }}">All</a>
+      </div>
+      <a href="{{ url_for('builty.create_builty') }}" class="btn btn-primary new-btn">New Builty</a>
+    </div>
+  </div>
+
+  <!-- Builty Table -->
+  <div class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Firm</th>
+          <th>Consignor</th>
+          <th>Consignee</th>
+          <th>Vehicle</th>
+          <th>Driver</th>
+          <th>Goods</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for builty in builty_list %}
+        <tr>
+          <td>{{ builty.date.strftime('%b %d, %Y') }}</td>
+          <td>
+            <div style="display: flex; align-items: center; gap: var(--space-2);">
+              <div class="product-avatar">{{ builty.firm[:2].upper() if builty.firm else 'JC' }}</div>
+              <span>{{ builty.firm if builty.firm else 'Jalaram Cargo' }}</span>
+            </div>
+          </td>
+          <td>
+            {% if builty.consignor %}
+              {{ builty.consignor.name }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>
+            {% if builty.consignee %}
+              {{ builty.consignee.name }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>
+            {% if builty.vehicle %}
+              {{ builty.vehicle.registration_number }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>
+            {% if builty.driver %}
+              {{ builty.driver.name }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>
+            {% if builty.goods %}
+              {{ builty.goods.description }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>
+            {% if builty.status == 'in_transit' %}
+              <span class="status-badge status-pending">In Transit</span>
+            {% elif builty.status == 'delivered' %}
+              <span class="status-badge status-active">Delivered</span>
+            {% else %}
+              <span class="status-badge status-inactive">Pending</span>
+            {% endif %}
+          </td>
+          <td>
+            <button class="action-btn" onclick="viewBuilty({{ builty.id }})">⋯</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if not builty_list %}
+  <div style="text-align: center; padding: var(--space-16); color: var(--text-secondary);">
+    <div class="empty-state-icon truck-icon"></div>
+    <h3 style="color: var(--text-primary); margin-bottom: var(--space-2);">No builty found</h3>
+    <p style="margin-bottom: var(--space-6);">Create your first builty to get started.</p>
+    <a href="{{ url_for('builty.create_builty') }}" class="btn btn-primary">New Builty</a>
+  </div>
+  {% endif %}
+
+
+<script>
+function viewBuilty(builtyId) {
+  window.location.href = `/builty/${builtyId}/view`;
+}
+
+function deleteBuilty(builtyId) {
+  if (confirm('Are you sure you want to delete this builty?')) {
+    fetch(`/builty/${builtyId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert('Error deleting builty');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error deleting builty');
+    });
+  }
+}
+</script>
+{% endblock %}

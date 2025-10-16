@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Owners{% endblock %}
+{% block content %}
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <h2>Owners</h2>
+    <a class="btn" href="{{ url_for('owners.create') }}">New Owner</a>
+  </div>
+  <table style="width:100%;border-collapse:collapse;">
+    <thead><tr><th>Name</th><th>Phone</th><th>PAN</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for i in items %}
+      <tr>
+        <td>{{ i.name }}</td>
+        <td>{{ i.phone }}</td>
+        <td>{{ i.pan }}</td>
+        <td><a class="btn secondary" href="{{ url_for('owners.edit', item_id=i.id) }}">Edit</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

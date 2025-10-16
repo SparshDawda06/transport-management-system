@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Agents - TMS{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Booking Agents</h1>
+    <a href="{{ url_for('entities.create_agent') }}" class="btn btn-primary">Add Agent</a>
+</div>
+
+<div class="card">
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>GSTIN</th>
+                    <th>City</th>
+                    <th>State</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.phone or '-' }}</td>
+                    <td>{{ item.gstin or '-' }}</td>
+                    <td>{{ item.city or '-' }}</td>
+                    <td>{{ item.state or '-' }}</td>
+                    <td>{{ item.email or '-' }}</td>
+                    <td>
+                        <a href="{{ url_for('entities.edit_agent', item_id=item.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

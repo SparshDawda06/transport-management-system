@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Goods{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>{{ 'New Goods' if mode=='create' else 'Edit Goods' }}</h2>
+  <form method="post">{{ form.csrf_token }}
+    <div class="form-row"><div class="field">{{ form.description.label }}{{ form.description() }}</div></div>
+    <button class="btn" type="submit">Save</button>
+  </form>
+</div>
+{% endblock %}

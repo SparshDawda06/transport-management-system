@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% block title %}Order{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>{{ 'New Order' if mode=='create' else 'Edit Order' }}</h2>
+  <form method="post" id="orderForm">
+    {{ form.csrf_token }}
+    
+    <div class="form-row">
+      <div class="field">{{ form.date.label }}{{ form.date() }}</div>
+      <div class="field">{{ form.firm.label }}{{ form.firm() }}</div>
+    </div>
+    
+    <div class="form-row">
+      <div class="field">{{ form.order_type.label }}{{ form.order_type(id='order_type') }}</div>
+      <div class="field">{{ form.status.label }}{{ form.status() }}</div>
+    </div>
+    
+    <h3 style="margin-top:20px;margin-bottom:10px;font-size:16px;">Goods Information</h3>
+    <div class="form-row">
+      <div class="field-with-add">
+        <div class="field">{{ form.goods_id.label }}{{ form.goods_id(id='goods_id') }}</div>
+        <button type="button" class="icon-add" title="Add Goods" onclick="TMS.openInline('goods')">+</button>
+      </div>
+      <div class="field">{{ form.weight.label }}{{ form.weight() }}</div>
+    </div>
+    <div class="field">{{ form.description.label }}{{ form.description() }}</div>
+    
+    <div id="partySection">
+      <h3 style="margin-top:20px;margin-bottom:10px;font-size:16px;">Consignor Details (From)</h3>
+      <div class="form-row">
+        <div class="field-with-add">
+          <div class="field">{{ form.consignor_id.label }}{{ form.consignor_id(id='consignor_id') }}</div>
+          <button type="button" class="icon-add" title="Add Consignor" onclick="TMS.openInline('consignors')">+</button>
+        </div>
+        <div class="field-with-add">
+          <div class="field">{{ form.from_station_id.label }}{{ form.from_station_id(id='from_station_id') }}</div>
+          <button type="button" class="icon-add" title="Add Station" onclick="TMS.openInline('stations')">+</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">{{ form.consignor_phone.label }}{{ form.consignor_phone() }}</div>
+      </div>
+      
+      <h3 style="margin-top:20px;margin-bottom:10px;font-size:16px;">Consignee Details (To)</h3>
+      <div class="form-row">
+        <div class="field-with-add">
+          <div class="field">{{ form.consignee_id.label }}{{ form.consignee_id(id='consignee_id') }}</div>
+          <button type="button" class="icon-add" title="Add Consignee" onclick="TMS.openInline('consignees')">+</button>
+        </div>
+        <div class="field-with-add">
+          <div class="field">{{ form.to_station_id.label }}{{ form.to_station_id(id='to_station_id') }}</div>
+          <button type="button" class="icon-add" title="Add Station" onclick="TMS.openInline('stations')">+</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">{{ form.consignee_phone.label }}{{ form.consignee_phone() }}</div>
+      </div>
+    </div>
+    
+    <div id="agentSection" style="display:none;">
+      <h3 style="margin-top:20px;margin-bottom:10px;font-size:16px;">Agent Details</h3>
+      <div class="form-row">
+        <div class="field-with-add">
+          <div class="field">{{ form.booking_agent_id.label }}{{ form.booking_agent_id(id='booking_agent_id') }}</div>
+          <button type="button" class="icon-add" title="Add Agent" onclick="TMS.openInline('booking_agents')">+</button>
+        </div>
+      </div>
+    </div>
+    
+    <h3 style="margin-top:20px;margin-bottom:10px;font-size:16px;">Additional Information</h3>
+    <div class="form-row">
+      <div class="field">{{ form.order_by.label }}{{ form.order_by() }}</div>
+      <div class="field">{{ form.party.label }}{{ form.party() }}</div>
+    </div>
+    
+    <button class="btn" type="submit" style="margin-top:20px;">Save Order</button>
+  </form>
+</div>
+
+<div id="inline-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);align-items:center;justify-content:center;">
+  <div style="background:#fff;padding:16px;border-radius:10px;min-width:360px;max-width:90vw;display:flex;gap:12px;">
+    <div id="inline-wrap" style="display:flex;gap:12px;"></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+TMS.inlineSaved = async function(entity, id, label){
+  const map = {
+    'consignors': 'consignor_id',
+    'consignees': 'consignee_id',
+    'goods': 'goods_id',
+    'booking_agents': 'booking_agent_id',
+    'stations': ['from_station_id', 'to_station_id']
+  };
+  const selectId = map[entity];
+  if(!selectId) return TMS.closeInline();
+  
+  const ids = Array.isArray(selectId) ? selectId : [selectId];
+  ids.forEach(x => {
+    const sel = document.getElementById(x);
+    if(sel){
+      const option = Array.from(sel.options).find(opt => opt.value == id);
+      if(option){
+        sel.value = id;
+      } else {
+        const newOpt = document.createElement('option');
+        newOpt.value = id;
+        newOpt.textContent = label;
+        newOpt.selected = true;
+        sel.appendChild(newOpt);
+      }
+    }
+  });
+  TMS.closeInline();
+};
+
+// Conditional display based on order type
+(function(){
+  const orderTypeSelect = document.getElementById('order_type');
+  const partySection = document.getElementById('partySection');
+  const agentSection = document.getElementById('agentSection');
+  
+  function toggleSections(){
+    const orderType = orderTypeSelect.value;
+    if(orderType === 'PARTY'){
+      partySection.style.display = 'block';
+      agentSection.style.display = 'none';
+    } else if(orderType === 'AGENT'){
+      partySection.style.display = 'none';
+      agentSection.style.display = 'block';
+    }
+  }
+  
+  if(orderTypeSelect){
+    orderTypeSelect.addEventListener('change', toggleSections);
+    toggleSections(); // Initialize on load
+  }
+})();
+
+// Bidirectional linking: From Station ↔ Consignor, To Station ↔ Consignee
+(function(){
+  const fromStationSelect = document.getElementById('from_station_id');
+  const toStationSelect = document.getElementById('to_station_id');
+  const consignorSelect = document.getElementById('consignor_id');
+  const consigneeSelect = document.getElementById('consignee_id');
+  
+  let consignorStationMap = {};
+  let consigneeStationMap = {};
+  let manualFromStationSet = false;
+  let manualToStationSet = false;
+  
+  // Fetch relationships
+  async function fetchRelationships(){
+    try {
+      const [consignors, consignees] = await Promise.all([
+        fetch('/api/consignors').then(r => r.json()),
+        fetch('/api/consignees').then(r => r.json())
+      ]);
+      
+      consignors.forEach(c => {
+        consignorStationMap[c.id] = c.station_id;
+      });
+      consignees.forEach(c => {
+        consigneeStationMap[c.id] = c.station_id;
+      });
+      
+      // Initial sort if stations are already selected
+      if(fromStationSelect && fromStationSelect.value && fromStationSelect.value != '0'){
+        sortOptionsByStation(consignorSelect, fromStationSelect.value, consignorStationMap);
+      }
+      if(toStationSelect && toStationSelect.value && toStationSelect.value != '0'){
+        sortOptionsByStation(consigneeSelect, toStationSelect.value, consigneeStationMap);
+      }
+    } catch(e){
+      console.error('Failed to fetch relationships', e);
+    }
+  }
+  
+  // When consignor changes, update from station if not manually set
+  if(consignorSelect){
+    consignorSelect.addEventListener('change', function(){
+      if(!manualFromStationSet && this.value && this.value != '0'){
+        const stationId = consignorStationMap[this.value];
+        if(stationId && fromStationSelect){
+          fromStationSelect.value = stationId;
+        }
+      }
+    });
+  }
+  
+  // When consignee changes, update to station if not manually set
+  if(consigneeSelect){
+    consigneeSelect.addEventListener('change', function(){
+      if(!manualToStationSet && this.value && this.value != '0'){
+        const stationId = consigneeStationMap[this.value];
+        if(stationId && toStationSelect){
+          toStationSelect.value = stationId;
+        }
+      }
+    });
+  }
+  
+  // When from station is manually changed
+  if(fromStationSelect){
+    fromStationSelect.addEventListener('change', function(){
+      if(this.value && this.value != '0'){
+        manualFromStationSet = true;
+        sortOptionsByStation(consignorSelect, this.value, consignorStationMap);
+      }
+    });
+  }
+  
+  // When to station is manually changed
+  if(toStationSelect){
+    toStationSelect.addEventListener('change', function(){
+      if(this.value && this.value != '0'){
+        manualToStationSet = true;
+        sortOptionsByStation(consigneeSelect, this.value, consigneeStationMap);
+      }
+    });
+  }
+  
+  // Sort and highlight matching options
+  function sortOptionsByStation(select, stationId, stationMap){
+    if(!select || !stationId) return;
+    
+    const currentValue = select.value;
+    const options = Array.from(select.options);
+    const firstOption = options.shift();
+    
+    options.sort((a, b) => {
+      const aStation = stationMap[a.value];
+      const bStation = stationMap[b.value];
+      
+      if(aStation == stationId && bStation != stationId) return -1;
+      if(aStation != stationId && bStation == stationId) return 1;
+      
+      return a.text.replace('★ ', '').localeCompare(b.text.replace('★ ', ''));
+    });
+    
+    select.innerHTML = '';
+    select.appendChild(firstOption);
+    options.forEach(opt => {
+      const optStation = stationMap[opt.value];
+      if(optStation == stationId){
+        opt.text = '★ ' + opt.text.replace('★ ', '');
+      } else {
+        opt.text = opt.text.replace('★ ', '');
+      }
+      select.appendChild(opt);
+    });
+    
+    if(currentValue) select.value = currentValue;
+  }
+  
+  fetchRelationships();
+})();
+</script>
+{% endblock %}
+

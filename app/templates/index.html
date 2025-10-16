@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - Transport Management{% endblock %}
+{% block content %}
+<div class="dashboard-header">
+  <h1 class="dashboard-title">Dashboard</h1>
+</div>
+
+<div class="dashboard-grid">
+  <!-- Quick Actions - Compact Row -->
+  <div class="dashboard-section">
+    <div class="section-header">
+      <h3>Quick Actions</h3>
+    </div>
+    <div class="action-buttons">
+      <a href="/orders/new" class="action-btn primary">
+        <i class="fas fa-plus"></i>
+        <span>New Order</span>
+      </a>
+      <a href="/builty/new" class="action-btn accent">
+        <i class="fas fa-truck"></i>
+        <span>New Builty</span>
+      </a>
+      <a href="/orders" class="action-btn secondary">
+        <i class="fas fa-list"></i>
+        <span>Orders</span>
+      </a>
+      <a href="/builty" class="action-btn secondary">
+        <i class="fas fa-receipt"></i>
+        <span>Builty</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Main Management Sections - 3 Column Layout -->
+  <div class="management-grid">
+    <!-- Entities Management -->
+    <div class="management-card">
+      <div class="card-header">
+        <h4>Entities</h4>
+        <p>Business Partners</p>
+      </div>
+      <div class="card-actions">
+        <a href="/entities/consignors" class="card-btn">
+          <i class="fas fa-user-tie"></i>
+          <span>Consignors</span>
+        </a>
+        <a href="/entities/consignees" class="card-btn">
+          <i class="fas fa-user-check"></i>
+          <span>Consignees</span>
+        </a>
+        <a href="/entities/agents" class="card-btn">
+          <i class="fas fa-handshake"></i>
+          <span>Agents</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Fleet Management -->
+    <div class="management-card">
+      <div class="card-header">
+        <h4>Fleet</h4>
+        <p>Transportation</p>
+      </div>
+      <div class="card-actions">
+        <a href="/fleet/vehicles" class="card-btn">
+          <i class="fas fa-truck"></i>
+          <span>Vehicles</span>
+        </a>
+        <a href="/fleet/drivers" class="card-btn">
+          <i class="fas fa-user"></i>
+          <span>Drivers</span>
+        </a>
+        <a href="/fleet/owners" class="card-btn">
+          <i class="fas fa-id-card"></i>
+          <span>Owners</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- System Management -->
+    <div class="management-card">
+      <div class="card-header">
+        <h4>System</h4>
+        <p>Configuration</p>
+      </div>
+      <div class="card-actions">
+        <a href="/system/stations" class="card-btn">
+          <i class="fas fa-building"></i>
+          <span>Stations</span>
+        </a>
+        <a href="/system/goods" class="card-btn">
+          <i class="fas fa-box"></i>
+          <span>Goods</span>
+        </a>
+        <a href="/system/pincodes" class="card-btn">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Pin Codes</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phone Book - Full Width -->
+  <div class="dashboard-section">
+    <div class="section-header">
+      <h3>Phone Book</h3>
+      <p>Contact Management</p>
+    </div>
+    <div class="phonebook-action">
+      <a href="/phonebook" class="action-btn warning">
+        <i class="fas fa-phone"></i>
+        <span>Manage Contacts</span>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

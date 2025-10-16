@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Create' if mode == 'create' else 'Edit' }} Driver - TMS{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">{{ 'Create' if mode == 'create' else 'Edit' }} Driver</h1>
+    <div class="page-actions">
+        <a href="{{ url_for('fleet.list_drivers') }}" class="btn btn-secondary">Back to Drivers</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">{{ 'Create New Driver' if mode == 'create' else 'Edit Driver' }}</h2>
+        <p class="card-subtitle">{{ 'Add a new driver to your fleet' if mode == 'create' else 'Update driver information' }}</p>
+    </div>
+    
+    <div class="card-content">
+        <form method="POST" class="form">
+            {{ form.hidden_tag() }}
+            
+            <div class="form-row">
+                <div class="form-group col-6">
+                    {{ form.name.label(class="form-label") }}
+                    {{ form.name(class="form-input") }}
+                    {% if form.name.errors %}
+                        <div class="form-error">
+                            {% for error in form.name.errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group col-6">
+                    {{ form.license_no.label(class="form-label") }}
+                    {{ form.license_no(class="form-input") }}
+                    {% if form.license_no.errors %}
+                        <div class="form-error">
+                            {% for error in form.license_no.errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group col-6">
+                    {{ form.license_type.label(class="form-label") }}
+                    {{ form.license_type(class="form-select") }}
+                    {% if form.license_type.errors %}
+                        <div class="form-error">
+                            {% for error in form.license_type.errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group col-6">
+                    {{ form.validity.label(class="form-label") }}
+                    {{ form.validity(class="form-input", type="date") }}
+                    {% if form.validity.errors %}
+                        <div class="form-error">
+                            {% for error in form.validity.errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group col-6">
+                    {{ form.phone.label(class="form-label") }}
+                    {{ form.phone(class="form-input") }}
+                    {% if form.phone.errors %}
+                        <div class="form-error">
+                            {% for error in form.phone.errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group col-6">
+                    {{ form.email.label(class="form-label") }}
+                    {{ form.email(class="form-input") }}
+                    {% if form.email.errors %}
+                        <div class="form-error">
+                            {% for error in form.email.errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group col-12">
+                    {{ form.address.label(class="form-label") }}
+                    {{ form.address(class="form-textarea") }}
+                    {% if form.address.errors %}
+                        <div class="form-error">
+                            {% for error in form.address.errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-actions btn-container btn-container-right">
+                <a href="{{ url_for('fleet.list_drivers') }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">{{ 'Create Driver' if mode == 'create' else 'Update Driver' }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

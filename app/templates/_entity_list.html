@@ -1,0 +1,16 @@
+{% macro table(headers, rows) %}
+<table style="width:100%;border-collapse:collapse;">
+  <thead>
+    <tr>
+      {% for h in headers %}<th>{{ h }}</th>{% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in rows %}
+      <tr>
+        {% for cell in r %}<td>{{ cell|safe }}</td>{% endfor %}
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endmacro %}

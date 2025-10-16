@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Pin Codes - TMS{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Pin Codes</h1>
+    <a href="{{ url_for('system.create_pincode') }}" class="btn btn-primary">Add Pin Code</a>
+</div>
+
+<div class="card">
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>State</th>
+                    <th>Station</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.code }}</td>
+                    <td>{{ item.state or '-' }}</td>
+                    <td>{{ item.station.name if item.station else '-' }}</td>
+                    <td>
+                        <a href="{{ url_for('system.edit_pincode', item_id=item.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

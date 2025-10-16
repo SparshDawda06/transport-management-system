@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% block title %}Phone Management - {{ entity_type }} #{{ entity_id }}{% endblock %}
+{% block content %}
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h2>Phone Numbers</h2>
+      <p style="color: #666; margin: 8px 0 0 0;">Manage phone numbers for {{ entity_name }}</p>
+    </div>
+    <div style="display:flex;gap:12px;">
+      <button class="btn" onclick="openAddPhoneModal()">Add Phone Number</button>
+      <a href="/{{ entity_type.lower() }}s/{{ entity_id }}/edit" class="btn secondary">← Back to {{ entity_type }}</a>
+    </div>
+  </div>
+  
+  <div id="entityPhoneList">
+    <!-- Phone numbers will be loaded here -->
+  </div>
+</div>
+
+<!-- Add Phone Modal -->
+<div id="addPhoneModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);align-items:center;justify-content:center;z-index:1000;">
+  <div style="background:#fff;padding:24px;border-radius:12px;min-width:400px;max-width:90vw;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <h3>Add Phone Number</h3>
+      <button id="closeAddModal" style="background:none;border:none;font-size:24px;cursor:pointer;">&times;</button>
+    </div>
+    
+    <form id="addPhoneForm">
+      <div class="field" style="margin-bottom:16px;">
+        <label for="newPhoneNumber">Phone Number</label>
+        <input type="text" id="newPhoneNumber" name="phone_number" required 
+               placeholder="Enter phone number..." 
+               style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid var(--border);">
+      </div>
+      
+      <div class="field" style="margin-bottom:16px;">
+        <label for="newPhoneLabel">Label (Optional)</label>
+        <select id="newPhoneLabel" name="label" 
+                style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid var(--border);">
+          <option value="Mobile">Mobile</option>
+          <option value="Office">Office</option>
+          <option value="Home">Home</option>
+          <option value="Fax">Fax</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      
+      <div class="field" style="margin-bottom:20px;">
+        <label style="display:flex;align-items:center;gap:8px;">
+          <input type="checkbox" id="newIsPrimary" name="is_primary">
+          <span>Set as primary phone number</span>
+        </label>
+      </div>
+      
+      <div style="display:flex;gap:12px;justify-content:flex-end;">
+        <button type="button" id="cancelAddPhone" class="btn secondary">Cancel</button>
+        <button type="submit" class="btn">Add Phone</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+let entityType = '{{ entity_type }}';
+let entityId = {{ entity_id }};
+let entityName = '{{ entity_name }}';
+
+document.addEventListener('DOMContentLoaded', function() {
+  loadEntityPhones();
+  setupAddPhoneModal();
+});
+
+function setupAddPhoneModal() {
+  const modal = document.getElementById('addPhoneModal');
+  const form = document.getElementById('addPhoneForm');
+  
+  document.getElementById('closeAddModal').addEventListener('click', closeAddModal);
+  document.getElementById('cancelAddPhone').addEventListener('click', closeAddModal);
+  form.addEventListener('submit', handleAddPhone);
+  
+  // Close modal when clicking outside
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeAddModal();
+    }
+  });
+}
+
+function openAddPhoneModal() {
+  document.getElementById('addPhoneModal').style.display = 'flex';
+  document.getElementById('newPhoneNumber').focus();
+}
+
+function closeAddModal() {
+  document.getElementById('addPhoneModal').style.display = 'none';
+  document.getElementById('addPhoneForm').reset();
+}
+
+async function loadEntityPhones() {
+  try {
+    const response = await fetch(`/phonebook/api/entity/${entityType}/${entityId}`);
+    const phones = await response.json();
+    renderEntityPhoneList(phones);
+  } catch (error) {
+    console.error('Error loading entity phones:', error);
+    document.getElementById('entityPhoneList').innerHTML = `
+      <div style="text-align: center; color: #e74c3c; padding: 40px;">
+        <p>Error loading phone numbers</p>
+      </div>
+    `;
+  }
+}
+
+function renderEntityPhoneList(phones) {
+  const container = document.getElementById('entityPhoneList');
+  
+  if (phones.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; color: #666; padding: 40px;">
+        <div class="empty-state-icon phone-icon"></div>
+        <p>No phone numbers added yet</p>
+        <button class="btn" onclick="openAddPhoneModal()" style="margin-top: 16px;">Add First Phone Number</button>
+      </div>
+    `;
+    return;
+  }
+  
+  container.innerHTML = `
+    <div style="display: grid; gap: 12px;">
+      ${phones.map(phone => renderPhoneCard(phone)).join('')}
+    </div>
+  `;
+}
+
+function renderPhoneCard(phone) {
+  return `
+    <div class="phone-card" style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; background: white;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div style="flex: 1;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <span style="font-family: monospace; font-size: 18px; font-weight: bold;">${phone.phone_number}</span>
+            ${phone.label ? `<span style="background: #f3f4f6; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${phone.label}</span>` : ''}
+            ${phone.is_primary ? '<span style="background: #10b981; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">PRIMARY</span>' : ''}
+          </div>
+          <div style="font-size: 14px; color: #666;">
+            Added: ${new Date(phone.created_at).toLocaleDateString()}
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          ${!phone.is_primary ? `<button class="btn small" onclick="setPrimaryPhone(${phone.id})">Set Primary</button>` : ''}
+          <button class="btn small secondary" onclick="editPhone(${phone.id}, '${phone.phone_number}', '${phone.label || ''}', ${phone.is_primary})">Edit</button>
+          <button class="btn small secondary" onclick="deletePhone(${phone.id})" style="color: #e74c3c;">Delete</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function handleAddPhone(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(e.target);
+  const phoneData = {
+    entity_type: entityType,
+    entity_id: entityId,
+    phone_number: formData.get('phone_number').trim(),
+    label: formData.get('label'),
+    is_primary: formData.get('is_primary') === 'on'
+  };
+  
+  if (!phoneData.phone_number || phoneData.phone_number.length < 10) {
+    alert('Please enter a valid phone number (at least 10 digits)');
+    return;
+  }
+  
+  try {
+    const response = await fetch('/phonebook/api/phone', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(phoneData)
+    });
+    
+    if (response.ok) {
+      closeAddModal();
+      loadEntityPhones(); // Refresh the list
+    } else {
+      const error = await response.json();
+      alert(error.error || 'Error adding phone number');
+    }
+  } catch (error) {
+    console.error('Add phone error:', error);
+    alert('Error adding phone number');
+  }
+}
+
+async function setPrimaryPhone(phoneId) {
+  if (!confirm('Set this as the primary phone number?')) return;
+  
+  try {
+    const response = await fetch(`/phonebook/api/phone/${phoneId}/set-primary`, {
+      method: 'POST'
+    });
+    
+    if (response.ok) {
+      loadEntityPhones(); // Refresh the list
+    } else {
+      alert('Error setting primary phone');
+    }
+  } catch (error) {
+    console.error('Set primary error:', error);
+    alert('Error setting primary phone');
+  }
+}
+
+function editPhone(id, phoneNumber, label, isPrimary) {
+  // For now, just show an alert - you can implement a full edit modal later
+  const newLabel = prompt('Enter new label:', label);
+  if (newLabel !== null) {
+    updatePhoneLabel(id, newLabel);
+  }
+}
+
+async function updatePhoneLabel(phoneId, label) {
+  try {
+    const response = await fetch(`/phonebook/api/phone/${phoneId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ label: label })
+    });
+    
+    if (response.ok) {
+      loadEntityPhones(); // Refresh the list
+    } else {
+      alert('Error updating phone label');
+    }
+  } catch (error) {
+    console.error('Update phone error:', error);
+    alert('Error updating phone label');
+  }
+}
+
+async function deletePhone(phoneId) {
+  if (!confirm('Delete this phone number?')) return;
+  
+  try {
+    const response = await fetch(`/phonebook/api/phone/${phoneId}`, {
+      method: 'DELETE'
+    });
+    
+    if (response.ok) {
+      loadEntityPhones(); // Refresh the list
+    } else {
+      alert('Error deleting phone number');
+    }
+  } catch (error) {
+    console.error('Delete phone error:', error);
+    alert('Error deleting phone number');
+  }
+}
+</script>
+{% endblock %}

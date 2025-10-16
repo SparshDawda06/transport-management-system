@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% block title %}Drivers - TMS{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Drivers</h1>
+    <div class="page-actions btn-container btn-container-right">
+        <a href="{{ url_for('fleet.create_driver') }}" class="btn btn-primary">Add Driver</a>
+    </div>
+</div>
+
+<div class="table-container">
+    <div class="table-header">
+        <div class="table-title">
+            <span class="status-badge status-info">DRIVERS</span>
+            <h3>Driver List</h3>
+        </div>
+        <div class="table-actions">
+            <span class="table-count">{{ items|length }} drivers</span>
+        </div>
+    </div>
+    
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Driver</th>
+                    <th>License Details</th>
+                    <th>Validity</th>
+                    <th>Contact</th>
+                    <th>Address</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>
+                        <div class="entity-info">
+                            <div class="entity-avatar">{{ item.name[:2].upper() }}</div>
+                            <div class="entity-details">
+                                <div class="entity-name">{{ item.name }}</div>
+                                {% if item.license_no %}
+                                <div class="entity-meta">License: {{ item.license_no }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {% if item.license_no %}
+                        <div class="license-info">
+                            <div class="license-number">{{ item.license_no }}</div>
+                            {% if item.license_type %}
+                            <div class="license-type">{{ item.license_type }}</div>
+                            {% endif %}
+                        </div>
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.validity %}
+                        <div class="validity-info">
+                            <span class="status-badge status-success">{{ item.validity.strftime('%b %d, %Y') if item.validity else '-' }}</span>
+                        </div>
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.phone %}
+                        <div class="contact-info">
+                            <span class="phone-icon"></span>
+                            {{ item.phone }}
+                        </div>
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="address-info">
+                            {{ item.address or '-' }}
+                        </div>
+                    </td>
+                    <td>
+                        {% if item.validity and item.validity > today %}
+                        <span class="status-badge status-active">Active</span>
+                        {% elif item.validity and item.validity <= today %}
+                        <span class="status-badge status-danger">Expired</span>
+                        {% else %}
+                        <span class="status-badge status-warning">Unknown</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <a href="{{ url_for('fleet.edit_driver', item_id=item.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if not items %}
+<div class="empty-state">
+    <div class="empty-state-icon driver-icon"></div>
+    <h3 class="empty-state-title">No Drivers Found</h3>
+    <p class="empty-state-description">Start by adding your first driver to the system.</p>
+    <a href="{{ url_for('fleet.create_driver') }}" class="btn btn-primary">Add Driver</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,963 @@
+{% extends 'base.html' %}
+{% block title %}Builty{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>{{ 'New Builty' if mode=='create' else 'Edit Builty' }}</h2>
+  <form method="post" id="builtyForm">
+    {{ form.csrf_token }}
+    
+    <!-- Basic Information Section -->
+    <div class="form-section">
+      <h3 class="form-section-title">
+        <svg class="form-section-icon" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a2 2 0 114 0 2 2 0 01-4 0zm8 0a2 2 0 114 0 2 2 0 01-4 0z" clip-rule="evenodd"></path>
+        </svg>
+        Basic Information
+      </h3>
+      <div class="form-row">
+        <div class="field">{{ form.date.label }}{{ form.date() }}</div>
+        <div class="field">{{ form.order_id.label }}{{ form.order_id(id='order_id') }}</div>
+      </div>
+      <div class="form-row">
+        <div class="field">{{ form.firm.label }}{{ form.firm() }}</div>
+        <div class="field">{{ form.status.label }}{{ form.status() }}</div>
+      </div>
+    </div>
+    
+    <!-- Transport Details Section -->
+    <div class="form-section">
+      <h3 class="form-section-title">
+        <svg class="form-section-icon" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 2L3 7v11a1 1 0 001 1h12a1 1 0 001-1V7l-7-5zM8 15v-3h4v3H8z" clip-rule="evenodd"></path>
+        </svg>
+        Transport Details
+      </h3>
+    <div class="form-row">
+      <div class="field-with-add">
+        <div class="field">{{ form.vehicle_id.label }}{{ form.vehicle_id(id='vehicle_id') }}</div>
+        <button class="icon-add" type="button" title="Add Vehicle" onclick="TMS.openInline('vehicles')">+</button>
+      </div>
+      <div class="field-with-add">
+        <div class="field">{{ form.driver_id.label }}{{ form.driver_id(id='driver_id') }}</div>
+        <button class="icon-add" type="button" title="Add Driver" onclick="TMS.openInline('drivers')">+</button>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field-with-add">
+        <div class="field">{{ form.owner_id.label }}{{ form.owner_id(id='owner_id') }}</div>
+        <button class="icon-add" type="button" title="Add Owner" onclick="TMS.openInline('owners')">+</button>
+      </div>
+    </div>
+    </div>
+    
+    <!-- Route Information Section -->
+    <div class="form-section">
+      <h3 class="form-section-title">
+        <svg class="form-section-icon" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+        </svg>
+        Route Information
+      </h3>
+    <div class="form-row">
+      <div class="field-with-add">
+        <div class="field">{{ form.from_station_id.label }}{{ form.from_station_id(id='from_station_id') }}</div>
+        <button class="icon-add" type="button" title="Add Station" onclick="TMS.openInline('stations')">+</button>
+      </div>
+      <div class="field-with-add">
+        <div class="field">{{ form.to_station_id.label }}{{ form.to_station_id(id='to_station_id') }}</div>
+        <button class="icon-add" type="button" title="Add Station" onclick="TMS.openInline('stations')">+</button>
+      </div>
+    </div>
+    </div>
+    
+    <!-- Party Information Section -->
+    <div class="form-section">
+      <h3 class="form-section-title">
+        <svg class="form-section-icon" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"></path>
+        </svg>
+        Party Information
+      </h3>
+      
+      <!-- Consignor Subsection -->
+      <div class="form-subsection">
+        <h4 class="form-subsection-title">
+          <svg class="form-subsection-icon" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+          </svg>
+          Consignor Details
+        </h4>
+    <div class="form-row">
+      <div class="field-with-add">
+        <div class="field">{{ form.consignor_id.label }}{{ form.consignor_id(id='builty_consignor_id') }}</div>
+        <button class="icon-add" type="button" title="Add Consignor" onclick="TMS.openInline('consignors')">+</button>
+      </div>
+    </div>
+    
+    <div class="form-row">
+      <div class="field">
+        <label>Concerned Person</label>
+        <select id="consignor_concerned_person" name="consignor_concerned_person_id" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border);">
+          <option value="">Select concerned person...</option>
+        </select>
+        <div style="margin-top: 8px;">
+          <button type="button" class="btn small" onclick="addConcernedPerson('consignor')">Add Person</button>
+          <button type="button" class="btn small secondary" onclick="manageEntityPhones('consignor')">Manage All</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Phone Number</label>
+        <select id="consignor_phone_number" name="consignor_phone_number_id" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border);">
+          <option value="">Select phone number...</option>
+        </select>
+        <div style="margin-top: 8px;">
+          <button type="button" class="btn small" onclick="addPhoneNumber('consignor')">Add Phone</button>
+        </div>
+      </div>
+    </div>
+      </div>
+      
+      <!-- Consignee Subsection -->
+      <div class="form-subsection">
+        <h4 class="form-subsection-title">
+          <svg class="form-subsection-icon" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+          </svg>
+          Consignee Details
+        </h4>
+    <div class="form-row">
+      <div class="field-with-add">
+        <div class="field">{{ form.consignee_id.label }}{{ form.consignee_id(id='builty_consignee_id') }}</div>
+        <button class="icon-add" type="button" title="Add Consignee" onclick="TMS.openInline('consignees')">+</button>
+      </div>
+    </div>
+    
+    <div class="form-row">
+      <div class="field">
+        <label>Concerned Person</label>
+        <select id="consignee_concerned_person" name="consignee_concerned_person_id" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border);">
+          <option value="">Select concerned person...</option>
+        </select>
+        <div style="margin-top: 8px;">
+          <button type="button" class="btn small" onclick="addConcernedPerson('consignee')">Add Person</button>
+          <button type="button" class="btn small secondary" onclick="manageEntityPhones('consignee')">Manage All</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Phone Number</label>
+        <select id="consignee_phone_number" name="consignee_phone_number_id" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border);">
+          <option value="">Select phone number...</option>
+        </select>
+        <div style="margin-top: 8px;">
+          <button type="button" class="btn small" onclick="addPhoneNumber('consignee')">Add Phone</button>
+        </div>
+      </div>
+    </div>
+      </div>
+      
+      <!-- Booking Agent Subsection -->
+      <div class="form-subsection">
+        <h4 class="form-subsection-title">
+          <svg class="form-subsection-icon" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"></path>
+          </svg>
+          Booking Agent Details
+        </h4>
+<div class="form-row">
+  <div class="field-with-add">
+    <div class="field">{{ form.booking_agent_id.label }}{{ form.booking_agent_id(id='builty_booking_agent_id') }}</div>
+    <button class="icon-add" type="button" title="Add Agent" onclick="TMS.openInline('booking_agents')">+</button>
+  </div>
+</div>
+
+<div class="form-row">
+  <div class="field">
+    <label>Concerned Person</label>
+    <select id="agent_concerned_person" name="agent_concerned_person_id" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border);">
+      <option value="">Select concerned person...</option>
+    </select>
+    <div style="margin-top: 8px;">
+      <button type="button" class="btn small" onclick="addConcernedPerson('agent')">Add Person</button>
+      <button type="button" class="btn small secondary" onclick="manageEntityPhones('agent')">Manage All</button>
+    </div>
+  </div>
+  <div class="field">
+    <label>Phone Number</label>
+    <select id="agent_phone_number" name="agent_phone_number_id" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border);">
+      <option value="">Select phone number...</option>
+    </select>
+    <div style="margin-top: 8px;">
+      <button type="button" class="btn small" onclick="addPhoneNumber('agent')">Add Phone</button>
+    </div>
+  </div>
+</div>
+      </div>
+    </div>
+    
+    <div id="orderPartyInfo" style="display:none;">
+      <!-- Order-specific information will be populated here when creating from order -->
+    </div>
+    
+    <div id="orderAgentInfo" style="display:none;">
+      <!-- Order-specific agent information will be populated here when creating from order -->
+    </div>
+    
+    <h3 style="margin-top:20px;margin-bottom:10px;font-size:16px;">Goods & Weight</h3>
+    <div class="form-row">
+      <div class="field-with-add">
+        <div class="field">{{ form.goods_id.label }}{{ form.goods_id(id='goods_id') }}</div>
+        <button class="icon-add" type="button" title="Add Goods" onclick="TMS.openInline('goods')">+</button>
+      </div>
+      <div class="field">{{ form.actual_weight.label }}{{ form.actual_weight(id='actual_weight') }}</div>
+    </div>
+    <div class="form-row">
+      <div class="field">{{ form.charged_weight.label }}{{ form.charged_weight(id='charged_weight') }}</div>
+      <div class="field">{{ form.rate.label }}{{ form.rate(id='rate') }}</div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Total Amount</label>
+        <input type="text" id="total_amount" readonly style="background:#f3f4f6;" value="0.00">
+      </div>
+      <div class="field">{{ form.advance_amount.label }}{{ form.advance_amount(id='advance_amount') }}</div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Balance Amount</label>
+        <input type="text" id="balance_amount" readonly style="background:#f3f4f6;" value="0.00">
+      </div>
+    </div>
+    
+    <h3 style="margin-top:20px;margin-bottom:10px;font-size:16px;">Documentation</h3>
+    <div class="form-row">
+      <div class="field">{{ form.lr_no.label }}{{ form.lr_no() }}</div>
+      <div class="field">{{ form.invoice_no.label }}{{ form.invoice_no() }}</div>
+    </div>
+    <div class="form-row">
+      <div class="field">{{ form.eway_bill_no.label }}{{ form.eway_bill_no() }}</div>
+    </div>
+    
+    <button class="btn" type="submit" style="margin-top:20px;">Save Builty</button>
+  </form>
+</div>
+
+<div id="inline-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);align-items:center;justify-content:center;">
+  <div style="background:#fff;padding:16px;border-radius:10px;min-width:360px;max-width:90vw;display:flex;gap:12px;">
+    <div id="inline-wrap" style="display:flex;gap:12px;"></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/searchable-dropdown.js') }}"></script>
+<script>
+// Global variables for builty form
+let consignorSelect, consigneeSelect, agentSelect;
+let vehicleData = {};
+let manualOwnerSet = false;
+let manualDriverSet = false;
+
+// Initialize everything when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('Builty form initializing...');
+  
+  // Initialize TMS functionality first
+  if (typeof TMS !== 'undefined') {
+    TMS.enhanceSelects();
+    TMS.enhanceStationFields();
+    console.log('TMS functionality initialized');
+  }
+  
+  // Initialize searchable dropdowns (only for firm field)
+  setTimeout(() => {
+    if (typeof initializeSearchableDropdowns !== 'undefined') {
+      initializeSearchableDropdowns();
+      console.log('Searchable dropdowns initialized');
+    }
+  }, 100);
+  
+  // Initialize form elements
+  initializeFormElements();
+  
+  // Initialize vehicle/driver/owner relationships
+  initializeVehicleRelationships();
+  
+  // Initialize station filtering
+  initializeStationFiltering();
+  
+  // Initialize phone book functionality
+  initializePhoneBook();
+  
+  // Auto-populate from order if provided
+  autoPopulateFromOrder();
+  
+  // Load phone book data for existing selections
+  setTimeout(async () => {
+    // Get the current values from the form (if editing an existing builty)
+    const consignorConcernedPersonId = document.getElementById('consignor_concerned_person').value;
+    const consigneeConcernedPersonId = document.getElementById('consignee_concerned_person').value;
+    const agentConcernedPersonId = document.getElementById('agent_concerned_person').value;
+    
+    // Load concerned persons for consignor if selected
+    if(consignorSelect && consignorSelect.value && consignorSelect.value !== '0') {
+      await loadConcernedPersons('consignor', consignorSelect.value);
+      // Set the pre-selected concerned person if editing
+      if(consignorConcernedPersonId && consignorConcernedPersonId !== '') {
+        document.getElementById('consignor_concerned_person').value = consignorConcernedPersonId;
+        // Load phone numbers for the pre-selected concerned person
+        const consignorPhoneNumberId = document.getElementById('consignor_phone_number').value;
+        await loadPhoneNumbers('consignor', consignorConcernedPersonId);
+        // Set the pre-selected phone number if editing
+        if(consignorPhoneNumberId && consignorPhoneNumberId !== '') {
+          document.getElementById('consignor_phone_number').value = consignorPhoneNumberId;
+        }
+      }
+    }
+    
+    // Load concerned persons for consignee if selected
+    if(consigneeSelect && consigneeSelect.value && consigneeSelect.value !== '0') {
+      await loadConcernedPersons('consignee', consigneeSelect.value);
+      // Set the pre-selected concerned person if editing
+      if(consigneeConcernedPersonId && consigneeConcernedPersonId !== '') {
+        document.getElementById('consignee_concerned_person').value = consigneeConcernedPersonId;
+        // Load phone numbers for the pre-selected concerned person
+        const consigneePhoneNumberId = document.getElementById('consignee_phone_number').value;
+        await loadPhoneNumbers('consignee', consigneeConcernedPersonId);
+        // Set the pre-selected phone number if editing
+        if(consigneePhoneNumberId && consigneePhoneNumberId !== '') {
+          document.getElementById('consignee_phone_number').value = consigneePhoneNumberId;
+        }
+      }
+    }
+    
+    // Load concerned persons for agent if selected
+    if(agentSelect && agentSelect.value && agentSelect.value !== '0') {
+      await loadConcernedPersons('agent', agentSelect.value);
+      // Set the pre-selected concerned person if editing
+      if(agentConcernedPersonId && agentConcernedPersonId !== '') {
+        document.getElementById('agent_concerned_person').value = agentConcernedPersonId;
+        // Load phone numbers for the pre-selected concerned person
+        const agentPhoneNumberId = document.getElementById('agent_phone_number').value;
+        await loadPhoneNumbers('agent', agentConcernedPersonId);
+        // Set the pre-selected phone number if editing
+        if(agentPhoneNumberId && agentPhoneNumberId !== '') {
+          document.getElementById('agent_phone_number').value = agentPhoneNumberId;
+        }
+      }
+    }
+  }, 500);
+  
+  console.log('Builty form initialization complete');
+});
+
+// Initialize form elements
+function initializeFormElements() {
+  consignorSelect = document.getElementById('builty_consignor_id');
+  consigneeSelect = document.getElementById('builty_consignee_id');
+  agentSelect = document.getElementById('builty_booking_agent_id');
+  
+  // Initialize calculation listeners
+  const actualWeightField = document.getElementById('actual_weight');
+  const chargedWeightField = document.getElementById('charged_weight');
+  const rateField = document.getElementById('rate');
+  const advanceAmountField = document.getElementById('advance_amount');
+  
+  if (actualWeightField) actualWeightField.addEventListener('input', calculateAmounts);
+  if (chargedWeightField) chargedWeightField.addEventListener('input', calculateAmounts);
+  if (rateField) rateField.addEventListener('input', calculateAmounts);
+  if (advanceAmountField) advanceAmountField.addEventListener('input', calculateAmounts);
+}
+
+// Initialize vehicle/driver/owner relationships
+async function initializeVehicleRelationships() {
+  const vehicleSelect = document.getElementById('vehicle_id');
+  const driverSelect = document.getElementById('driver_id');
+  const ownerSelect = document.getElementById('owner_id');
+  
+  if (!vehicleSelect || !driverSelect || !ownerSelect) {
+    console.log('Vehicle/Driver/Owner selects not found');
+    return;
+  }
+  
+  // Fetch vehicle data
+  try {
+    const response = await fetch('/api/vehicles');
+    const vehicles = await response.json();
+    vehicles.forEach(v => {
+      vehicleData[v.id] = { owner_id: v.owner_id, driver_id: v.driver_id };
+    });
+    console.log('Vehicle data loaded:', Object.keys(vehicleData).length, 'vehicles');
+  } catch(e){
+    console.error('Failed to fetch vehicle data', e);
+  }
+  
+  // Owner change listener
+  ownerSelect.addEventListener('change', function(){
+    const ownerId = this.value;
+    manualOwnerSet = true;
+    
+    if(vehicleSelect && ownerId && ownerId != '0'){
+      const allOptions = Array.from(vehicleSelect.options);
+      const currentValue = vehicleSelect.value;
+      
+      allOptions.forEach(opt => {
+        if(opt.value == '0') return;
+        const vData = vehicleData[opt.value];
+        if(vData && vData.owner_id == ownerId){
+          opt.text = '★ ' + opt.text.replace('★ ', '');
+        } else {
+          opt.text = opt.text.replace('★ ', '');
+        }
+      });
+      
+      // Re-sort options
+      const options = Array.from(vehicleSelect.options);
+      const firstOpt = options.shift();
+      options.sort((a, b) => {
+        const aMatch = a.text.startsWith('★');
+        const bMatch = b.text.startsWith('★');
+        if(aMatch && !bMatch) return -1;
+        if(!aMatch && bMatch) return 1;
+        return a.text.localeCompare(b.text);
+      });
+      vehicleSelect.innerHTML = '';
+      vehicleSelect.appendChild(firstOpt);
+      options.forEach(o => vehicleSelect.appendChild(o));
+      if(currentValue) vehicleSelect.value = currentValue;
+    }
+  });
+  
+  // Vehicle change listener
+  vehicleSelect.addEventListener('change', function(){
+    const vehicleId = this.value;
+    
+    if(vehicleId && vehicleId != '0'){
+      const vData = vehicleData[vehicleId];
+      
+      if(vData && vData.owner_id && ownerSelect && !manualOwnerSet){
+        ownerSelect.value = vData.owner_id;
+      }
+      
+      if(vData && vData.driver_id && driverSelect && !manualDriverSet){
+        driverSelect.value = vData.driver_id;
+      }
+    }
+  });
+  
+  // Driver change listener
+  driverSelect.addEventListener('change', function(){
+    if(this.value && this.value != '0'){
+      manualDriverSet = true;
+    }
+  });
+}
+
+// Initialize station filtering functionality
+async function initializeStationFiltering() {
+  const fromStationSelect = document.getElementById('from_station_id');
+  const toStationSelect = document.getElementById('to_station_id');
+  
+  if (!fromStationSelect || !toStationSelect) {
+    console.log('Station selects not found');
+    return;
+  }
+  
+  // Station mapping data
+  let consignorStationMap = {};
+  let consigneeStationMap = {};
+  let agentStationMap = {};
+  let relationshipsLoaded = false;
+  
+  // Load station relationships
+  async function loadStationRelationships() {
+    if (relationshipsLoaded) return;
+    
+    try {
+      const [consignorsResponse, consigneesResponse, agentsResponse] = await Promise.all([
+        fetch('/api/consignors').then(r => r.json()),
+        fetch('/api/consignees').then(r => r.json()),
+        fetch('/api/booking_agents').then(r => r.json())
+      ]);
+      
+      // Populate maps
+      consignorsResponse.forEach(c => {
+        consignorStationMap[c.id] = c.station_id;
+      });
+      
+      consigneesResponse.forEach(c => {
+        consigneeStationMap[c.id] = c.station_id;
+      });
+      
+      agentsResponse.forEach(a => {
+        agentStationMap[a.id] = a.station_id;
+      });
+      
+      relationshipsLoaded = true;
+      console.log('Station relationships loaded');
+    } catch(e) {
+      console.error('Failed to load station relationships', e);
+    }
+  }
+  
+  // Sort options by station
+  function sortOptionsByStation(select, stationId, stationMap) {
+    if (!select || !stationId || !relationshipsLoaded) return;
+    
+    const currentValue = select.value;
+    const options = Array.from(select.options);
+    const firstOption = options.shift();
+    
+    let matchingCount = 0;
+    let nonMatchingCount = 0;
+    
+    options.sort((a, b) => {
+      const aStation = stationMap[a.value];
+      const bStation = stationMap[b.value];
+      
+      const aMatches = aStation == stationId;
+      const bMatches = bStation == stationId;
+      
+      if (aMatches) matchingCount++;
+      else nonMatchingCount++;
+      
+      if (aMatches && !bMatches) return -1;
+      if (!aMatches && bMatches) return 1;
+      return a.textContent.localeCompare(b.textContent);
+    });
+    
+    // Clear and rebuild select
+    select.innerHTML = '';
+    select.appendChild(firstOption);
+    
+    options.forEach(opt => {
+      const optStation = stationMap[opt.value];
+      const matches = optStation == stationId;
+      
+      if (matches) {
+        opt.text = '★ ' + opt.text.replace('★ ', '');
+        opt.style.backgroundColor = '#fef3c7';
+        opt.title = `Matches station ${stationId}`;
+      } else {
+        opt.text = opt.text.replace('★ ', '');
+        opt.style.backgroundColor = '';
+        opt.title = '';
+      }
+      
+      select.appendChild(opt);
+    });
+    
+    if (currentValue) select.value = currentValue;
+  }
+  
+  // Load relationships first
+  await loadStationRelationships();
+  
+  // When consignor changes, update from station
+  if (consignorSelect) {
+    consignorSelect.addEventListener('change', function() {
+      if (this.value && this.value !== '0') {
+        const stationId = consignorStationMap[this.value];
+        if (stationId && fromStationSelect) {
+          fromStationSelect.value = stationId;
+          // Sort consignors by station
+          sortOptionsByStation(consignorSelect, stationId, consignorStationMap);
+        }
+      }
+    });
+  }
+  
+  // When consignee changes, update to station
+  if (consigneeSelect) {
+    consigneeSelect.addEventListener('change', function() {
+      if (this.value && this.value !== '0') {
+        const stationId = consigneeStationMap[this.value];
+        if (stationId && toStationSelect) {
+          toStationSelect.value = stationId;
+          // Sort consignees by station
+          sortOptionsByStation(consigneeSelect, stationId, consigneeStationMap);
+        }
+      }
+    });
+  }
+  
+  // When agent changes, update from station
+  if (agentSelect) {
+    agentSelect.addEventListener('change', function() {
+      if (this.value && this.value !== '0') {
+        const stationId = agentStationMap[this.value];
+        if (stationId && fromStationSelect) {
+          fromStationSelect.value = stationId;
+          // Sort agents by station
+          sortOptionsByStation(agentSelect, stationId, agentStationMap);
+        }
+      }
+    });
+  }
+  
+  // When from station changes, sort consignors and agents
+  fromStationSelect.addEventListener('change', function() {
+    if (this.value && this.value !== '0') {
+      sortOptionsByStation(consignorSelect, this.value, consignorStationMap);
+      sortOptionsByStation(agentSelect, this.value, agentStationMap);
+    }
+  });
+  
+  // When to station changes, sort consignees
+  toStationSelect.addEventListener('change', function() {
+    if (this.value && this.value !== '0') {
+      sortOptionsByStation(consigneeSelect, this.value, consigneeStationMap);
+    }
+  });
+}
+
+// Initialize phone book functionality
+function initializePhoneBook() {
+  if (consignorSelect) {
+    consignorSelect.addEventListener('change', function() {
+      console.log('Consignor changed:', this.value);
+      const entityId = this.value;
+      if (entityId && entityId !== '0') {
+        loadConcernedPersons('consignor', entityId);
+      } else {
+        clearConcernedPersonAndPhone('consignor');
+      }
+    });
+  }
+  
+  if (consigneeSelect) {
+    consigneeSelect.addEventListener('change', function() {
+      console.log('Consignee changed:', this.value);
+      const entityId = this.value;
+      if (entityId && entityId !== '0') {
+        loadConcernedPersons('consignee', entityId);
+      } else {
+        clearConcernedPersonAndPhone('consignee');
+      }
+    });
+  }
+  
+  if (agentSelect) {
+    agentSelect.addEventListener('change', function() {
+      console.log('Agent changed:', this.value);
+      const entityId = this.value;
+      if (entityId && entityId !== '0') {
+        loadConcernedPersons('agent', entityId);
+      } else {
+        clearConcernedPersonAndPhone('agent');
+      }
+    });
+  }
+}
+
+// Auto-populate from order
+function autoPopulateFromOrder() {
+  {% if order_data %}
+  const orderData = {{ order_data|tojson }};
+  if(orderData){
+    console.log('Auto-populating from order:', orderData);
+    
+    // Populate basic fields
+    const actualWeightField = document.getElementById('actual_weight');
+    if(actualWeightField && orderData.weight){
+      actualWeightField.value = orderData.weight;
+    }
+    
+    const rateField = document.getElementById('rate');
+    if(rateField && orderData.rate){
+      rateField.value = orderData.rate;
+    }
+    
+    // Populate consignor/consignee/agent
+    if(orderData.order_type === 'PARTY'){
+      if(orderData.consignor_id && consignorSelect){
+        consignorSelect.value = orderData.consignor_id;
+        setTimeout(() => loadConcernedPersons('consignor', orderData.consignor_id), 100);
+      }
+      if(orderData.consignee_id && consigneeSelect){
+        consigneeSelect.value = orderData.consignee_id;
+        setTimeout(() => loadConcernedPersons('consignee', orderData.consignee_id), 100);
+      }
+    } else if(orderData.order_type === 'AGENT'){
+      if(orderData.booking_agent_id && agentSelect){
+        agentSelect.value = orderData.booking_agent_id;
+        setTimeout(() => loadConcernedPersons('agent', orderData.booking_agent_id), 100);
+      }
+    }
+    
+    calculateAmounts();
+  }
+  {% endif %}
+}
+
+// Load concerned persons for an entity
+async function loadConcernedPersons(entityType, entityId) {
+  console.log(`Loading concerned persons for ${entityType} ${entityId}`);
+  try {
+    const response = await fetch(`/phonebook/api/concerned-persons/${entityType.toUpperCase()}/${entityId}`);
+    const persons = await response.json();
+    console.log(`Found ${persons.length} concerned persons`);
+    
+    const select = document.getElementById(`${entityType}_concerned_person`);
+    if (!select) {
+      console.error(`Select element not found: ${entityType}_concerned_person`);
+      return;
+    }
+    
+    // Clear existing options
+    select.innerHTML = '<option value="">Select concerned person...</option>';
+    
+    // Add person options
+    persons.forEach(person => {
+      const option = document.createElement('option');
+      option.value = person.id;
+      option.textContent = `${person.name}${person.designation ? ` (${person.designation})` : ''}`;
+      if (person.is_primary) {
+        option.textContent += ' - PRIMARY';
+        option.selected = true;
+      }
+      select.appendChild(option);
+    });
+    
+    // Load phone numbers for the primary person
+    const primaryPerson = persons.find(p => p.is_primary);
+    if (primaryPerson) {
+      loadPhoneNumbers(entityType, primaryPerson.id);
+    }
+    
+    // Add event listener for concerned person changes (only if not already added)
+    if (!select.dataset.listenerAdded) {
+      select.dataset.listenerAdded = 'true';
+      select.addEventListener('change', function() {
+        const personId = this.value;
+        if (personId && personId !== '') {
+          loadPhoneNumbers(entityType, personId);
+        } else {
+          clearPhoneNumbers(entityType);
+        }
+      });
+    }
+    
+  } catch (error) {
+    console.error('Error loading concerned persons:', error);
+  }
+}
+
+// Load phone numbers for a concerned person
+async function loadPhoneNumbers(entityType, concernedPersonId) {
+  console.log(`Loading phone numbers for concerned person ${concernedPersonId}`);
+  try {
+    const response = await fetch(`/phonebook/api/phone-numbers/${concernedPersonId}`);
+    const phones = await response.json();
+    console.log(`Found ${phones.length} phone numbers`);
+    
+    const select = document.getElementById(`${entityType}_phone_number`);
+    if (!select) {
+      console.error(`Select element not found: ${entityType}_phone_number`);
+      return;
+    }
+    
+    // Clear existing options
+    select.innerHTML = '<option value="">Select phone number...</option>';
+    
+    // Add phone options
+    phones.forEach(phone => {
+      const option = document.createElement('option');
+      option.value = phone.id;
+      option.textContent = `${phone.phone_number}${phone.label ? ` (${phone.label})` : ''}`;
+      if (phone.is_primary) {
+        option.textContent += ' - PRIMARY';
+        option.selected = true;
+      }
+      select.appendChild(option);
+    });
+    
+  } catch (error) {
+    console.error('Error loading phone numbers:', error);
+  }
+}
+
+// Clear concerned person and phone number selections
+function clearConcernedPersonAndPhone(entityType) {
+  const concernedPersonSelect = document.getElementById(`${entityType}_concerned_person`);
+  const phoneSelect = document.getElementById(`${entityType}_phone_number`);
+  
+  if (concernedPersonSelect) {
+    concernedPersonSelect.innerHTML = '<option value="">Select concerned person...</option>';
+  }
+  
+  if (phoneSelect) {
+    phoneSelect.innerHTML = '<option value="">Select phone number...</option>';
+  }
+}
+
+// Clear phone numbers only
+function clearPhoneNumbers(entityType) {
+  const phoneSelect = document.getElementById(`${entityType}_phone_number`);
+  if (phoneSelect) {
+    phoneSelect.innerHTML = '<option value="">Select phone number...</option>';
+  }
+}
+
+// Calculate total and balance
+function calculateAmounts(){
+  const actualWeight = parseFloat(document.getElementById('actual_weight')?.value) || 0;
+  const chargedWeight = parseFloat(document.getElementById('charged_weight')?.value) || 0;
+  const rate = parseFloat(document.getElementById('rate')?.value) || 0;
+  const advance = parseFloat(document.getElementById('advance_amount')?.value) || 0;
+  
+  // Use higher weight for calculation
+  const weightForCalc = Math.max(actualWeight, chargedWeight);
+  const total = weightForCalc * rate;
+  const balance = total - advance;
+  
+  const totalField = document.getElementById('total_amount');
+  const balanceField = document.getElementById('balance_amount');
+  
+  if (totalField) totalField.value = total.toFixed(2);
+  if (balanceField) balanceField.value = balance.toFixed(2);
+}
+
+// TMS inline saved function
+TMS.inlineSaved = async function(entity, id, label){
+  const map = {
+    'vehicles': 'vehicle_id',
+    'drivers': 'driver_id',
+    'owners': 'owner_id',
+    'stations': ['from_station_id','to_station_id'],
+    'goods': 'goods_id'
+  };
+  const target = map[entity];
+  if(!target) return TMS.closeInline();
+  const ids = Array.isArray(target) ? target : [target];
+  ids.forEach(x => { 
+    const sel = document.getElementById(x); 
+    if(sel){
+      const option = Array.from(sel.options).find(opt => opt.value == id);
+      if(option){
+        sel.value = id;
+        // Trigger change event for vehicle relationships
+        if (entity === 'vehicles' && sel.id === 'vehicle_id') {
+          sel.dispatchEvent(new Event('change'));
+        }
+      } else {
+        const newOpt = document.createElement('option');
+        newOpt.value = id;
+        newOpt.textContent = label;
+        newOpt.selected = true;
+        sel.appendChild(newOpt);
+      }
+    }
+  });
+  TMS.closeInline();
+};
+
+// Add new concerned person
+async function addConcernedPerson(entityType) {
+  const entitySelect = entityType === 'consignor' ? consignorSelect : 
+                      entityType === 'consignee' ? consigneeSelect : 
+                      entityType === 'agent' ? agentSelect : null;
+  const entityId = entitySelect ? entitySelect.value : null;
+  
+  if (!entityId || entityId === '0') {
+    alert(`Please select a ${entityType} first before adding a concerned person`);
+    return;
+  }
+  
+  const name = prompt(`Enter the name of the concerned person for ${entityType}:`);
+  if (!name) return;
+  
+  const designation = prompt(`Enter the designation (optional):`);
+  
+  try {
+    const response = await fetch('/phonebook/api/concerned-person', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        entity_type: entityType.toUpperCase(),
+        entity_id: parseInt(entityId),
+        name: name,
+        designation: designation || null,
+        is_primary: false
+      })
+    });
+    
+    if (response.ok) {
+      loadConcernedPersons(entityType, entityId);
+      alert('Concerned person added successfully!');
+    } else {
+      alert('Error adding concerned person');
+    }
+  } catch (error) {
+    console.error('Error adding concerned person:', error);
+    alert('Error adding concerned person');
+  }
+}
+
+// Add new phone number
+async function addPhoneNumber(entityType) {
+  const concernedPersonSelect = document.getElementById(`${entityType}_concerned_person`);
+  const concernedPersonId = concernedPersonSelect ? concernedPersonSelect.value : null;
+  
+  if (!concernedPersonId || concernedPersonId === '') {
+    alert(`Please select a concerned person first before adding a phone number`);
+    return;
+  }
+  
+  const phoneNumber = prompt(`Enter the phone number for ${entityType}:`);
+  if (!phoneNumber) return;
+  
+  const label = prompt(`Enter a label for this phone number (optional, e.g., "Mobile", "Office"):`);
+  
+  try {
+    const response = await fetch('/phonebook/api/phone', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        concerned_person_id: parseInt(concernedPersonId),
+        phone_number: phoneNumber,
+        label: label || null,
+        is_primary: false
+      })
+    });
+    
+    if (response.ok) {
+      loadPhoneNumbers(entityType, concernedPersonId);
+      alert('Phone number added successfully!');
+    } else {
+      alert('Error adding phone number');
+    }
+  } catch (error) {
+    console.error('Error adding phone number:', error);
+    alert('Error adding phone number');
+  }
+}
+
+// Manage entity phones - open phone book with search
+window.manageEntityPhones = function(entityType) {
+  const entitySelect = entityType === 'consignor' ? consignorSelect : 
+                      entityType === 'consignee' ? consigneeSelect : 
+                      entityType === 'agent' ? agentSelect : null;
+  const entityId = entitySelect ? entitySelect.value : null;
+  
+  if (!entityId || entityId === '0') {
+    alert(`Please select a ${entityType} first before managing phone numbers`);
+    return;
+  }
+  
+  // Get entity name for better user experience
+  const selectedOption = entitySelect.options[entitySelect.selectedIndex];
+  const entityName = selectedOption ? selectedOption.textContent : `${entityType} #${entityId}`;
+  
+  // Get current form URL for return navigation
+  const currentUrl = window.location.href;
+  const returnUrl = encodeURIComponent(currentUrl);
+  
+  // Navigate to phone book in same tab with search filter and return URL
+  const url = `/phonebook?return_url=${returnUrl}&search=${encodeURIComponent(entityName.split(' - ')[0].replace(/★/g, '').trim())}&search_type=company`;
+  window.location.href = url;
+};
+</script>
+{% endblock %}

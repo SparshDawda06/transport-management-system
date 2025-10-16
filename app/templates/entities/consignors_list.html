@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block title %}Consignors - TMS{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Consignors</h1>
+    <div class="page-actions btn-container btn-container-right">
+        <a href="{{ url_for('entities.create_consignor') }}" class="btn btn-primary">Add Consignor</a>
+    </div>
+</div>
+
+<div class="table-container">
+    <div class="table-header">
+        <div class="table-title">
+            <span class="status-badge status-secondary">CONSIGNORS</span>
+            <h3>Consignor List</h3>
+        </div>
+        <div class="table-actions">
+            <span class="table-count">{{ items|length }} consignors</span>
+        </div>
+    </div>
+    
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>GSTIN</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Station</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>
+                        <div class="entity-info">
+                            <div class="entity-avatar">{{ item.name[:2].upper() }}</div>
+                            <div class="entity-details">
+                                <div class="entity-name">{{ item.name }}</div>
+                                {% if item.pan %}
+                                <div class="entity-meta">PAN: {{ item.pan }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="address-info">
+                            {{ item.address or '-' }}
+                        </div>
+                    </td>
+                    <td>
+                        {% if item.gstin %}
+                        <span class="status-badge status-info">{{ item.gstin }}</span>
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.phone %}
+                        <div class="contact-info">
+                            <span class="phone-icon"></span>
+                            {{ item.phone }}
+                        </div>
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.email %}
+                        <div class="contact-info">
+                            <span class="email-icon"></span>
+                            {{ item.email }}
+                        </div>
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.station %}
+                        <span class="status-badge status-success">{{ item.station.name }}</span>
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <a href="{{ url_for('entities.edit_consignor', item_id=item.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if not items %}
+<div class="empty-state">
+    <div class="empty-state-icon consignor-icon"></div>
+    <h3 class="empty-state-title">No Consignors Found</h3>
+    <p class="empty-state-description">Start by adding your first consignor to the system.</p>
+    <a href="{{ url_for('entities.create_consignor') }}" class="btn btn-primary">Add Consignor</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Agents{% endblock %}
+{% block content %}
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <h2>Agents</h2>
+    <a class="btn" href="{{ url_for('agents.create') }}">New Agent</a>
+  </div>
+  <table style="width:100%;border-collapse:collapse;">
+    <thead><tr><th>Name</th><th>Phone</th><th>City</th><th>State</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for i in items %}
+      <tr>
+        <td>{{ i.name }}</td>
+        <td>{{ i.phone }}</td>
+        <td>{{ i.city }}</td>
+        <td>{{ i.state }}</td>
+        <td><a class="btn secondary" href="{{ url_for('agents.edit', item_id=i.id) }}">Edit</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

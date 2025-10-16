@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}New Order - Select Type{% endblock %}
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 40px auto;">
+  <h2 style="text-align: center; margin-bottom: 30px;">Create New Order</h2>
+  <p style="text-align: center; color: #666; margin-bottom: 40px;">Choose the type of order you want to create</p>
+  
+  <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+    <!-- Party Order Card -->
+    <div class="order-type-card" data-type="PARTY" style="
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 200px;
+      background: white;
+    " onmouseover="this.style.borderColor='#3b82f6'; this.style.transform='translateY(-2px)'" 
+       onmouseout="this.style.borderColor='#e5e7eb'; this.style.transform='translateY(0)'">
+      <div class="order-type-icon party-icon"></div>
+      <h3 style="margin: 0 0 10px 0; color: #1f2937;">Party Order</h3>
+      <p style="margin: 0; color: #6b7280; font-size: 14px; line-height: 1.5;">
+        Order placed directly by<br>
+        <strong>Consignor & Consignee</strong>
+      </p>
+    </div>
+    
+    <!-- Agent Order Card -->
+    <div class="order-type-card" data-type="AGENT" style="
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 200px;
+      background: white;
+    " onmouseover="this.style.borderColor='#3b82f6'; this.style.transform='translateY(-2px)'" 
+       onmouseout="this.style.borderColor='#e5e7eb'; this.style.transform='translateY(0)'">
+      <div class="order-type-icon agent-icon"></div>
+      <h3 style="margin: 0 0 10px 0; color: #1f2937;">Agent Order</h3>
+      <p style="margin: 0; color: #6b7280; font-size: 14px; line-height: 1.5;">
+        Order placed through a<br>
+        <strong>Booking Agent</strong>
+      </p>
+    </div>
+  </div>
+  
+  <div style="text-align: center; margin-top: 30px;">
+    <a href="{{ url_for('orders.list_orders') }}" class="btn secondary">← Back to Orders</a>
+  </div>
+</div>
+
+<script>
+// Initialize order type selector when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('Order type selector page loaded');
+  
+  // The initialization is now handled by the base template's Barba hooks
+  // This ensures proper reinitialization after page transitions
+});
+</script>
+{% endblock %}

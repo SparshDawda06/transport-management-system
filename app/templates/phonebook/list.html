@@ -1,0 +1,346 @@
+{% extends 'base.html' %}
+{% block title %}Phone Book{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Phone Book</h1>
+  <div class="page-actions">
+    {% if entity_type and entity_id %}
+    <button class="btn btn-primary" onclick="addPhoneForEntity('{{ entity_type }}', {{ entity_id }})">Add Phone</button>
+    {% endif %}
+    {% if return_url %}
+    <a href="{{ return_url }}" class="btn btn-secondary">← Back to Form</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Phone Directory</h2>
+    <p class="card-subtitle">
+      {% if entity_type and entity_id %}
+        Manage phone numbers for {{ entity_type }} #{{ entity_id }}
+      {% else %}
+        Search and manage phone numbers for all entities
+      {% endif %}
+    </p>
+  </div>
+  
+  <div class="card-content">
+    <div class="search-section">
+      <div class="grid gap-3">
+        <div class="col-3">
+          <select id="searchType" class="form-select">
+            <option value="all" {% if search_type == 'all' %}selected{% endif %}>Search All</option>
+            <option value="company" {% if search_type == 'company' %}selected{% endif %}>By Company</option>
+            <option value="name" {% if search_type == 'name' %}selected{% endif %}>By Person Name</option>
+            <option value="phone" {% if search_type == 'phone' %}selected{% endif %}>By Phone Number</option>
+          </select>
+        </div>
+        <div class="col-9">
+          <div class="search-bar">
+            <input type="text" id="phoneSearch" placeholder="Search by phone, name, or company..." 
+                   value="{{ search_query }}" class="search-input">
+            <div class="search-icon"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+  <div id="phoneResults" style="margin-top: 16px;">
+    <div style="text-align: center; color: #666; padding: 40px;">
+      <div class="empty-state-icon phone-icon"></div>
+      <p>Start typing to search phone numbers, names, or companies</p>
+    </div>
+  </div>
+</div>
+
+<div id="phoneModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);align-items:center;justify-content:center;z-index:1000;">
+  <div style="background:#fff;padding:24px;border-radius:12px;min-width:400px;max-width:90vw;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <h3 id="modalTitle">Add Phone Number</h3>
+      <button id="closeModal" style="background:none;border:none;font-size:24px;cursor:pointer;">&times;</button>
+    </div>
+    
+    <form id="phoneForm">
+      <input type="hidden" id="phoneId" name="phone_id">
+      <input type="hidden" id="entityType" name="entity_type">
+      <input type="hidden" id="entityId" name="entity_id">
+      
+      <div class="field" style="margin-bottom:16px;">
+        <label for="phoneNumber">Phone Number</label>
+        <input type="text" id="phoneNumber" name="phone_number" required 
+               style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid var(--border);">
+      </div>
+      
+      <div class="field" style="margin-bottom:16px;">
+        <label for="phoneLabel">Label (Optional)</label>
+        <input type="text" id="phoneLabel" name="label" placeholder="e.g., Mobile, Office, Home"
+               style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid var(--border);">
+      </div>
+      
+      <div class="field" style="margin-bottom:20px;">
+        <label style="display:flex;align-items:center;gap:8px;">
+          <input type="checkbox" id="isPrimary" name="is_primary">
+          <span>Set as primary phone number</span>
+        </label>
+      </div>
+      
+      <div style="display:flex;gap:12px;justify-content:flex-end;">
+        <button type="button" id="cancelPhone" class="btn secondary">Cancel</button>
+        <button type="submit" class="btn">Save Phone</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+class PhoneBookManager {
+  constructor() {
+    this.searchInput = document.getElementById('phoneSearch');
+    this.searchType = document.getElementById('searchType');
+    this.resultsContainer = document.getElementById('phoneResults');
+    this.modal = document.getElementById('phoneModal');
+    this.form = document.getElementById('phoneForm');
+    this.modalTitle = document.getElementById('modalTitle');
+    
+    this.init();
+  }
+  
+  init() {
+    this.searchInput.addEventListener('input', this.debounce(this.searchPhones.bind(this), 300));
+    this.searchType.addEventListener('change', this.searchPhones.bind(this));
+    
+    document.getElementById('closeModal').addEventListener('click', this.closeModal.bind(this));
+    document.getElementById('cancelPhone').addEventListener('click', this.closeModal.bind(this));
+    this.form.addEventListener('submit', this.savePhone.bind(this));
+    
+    // Close modal when clicking outside
+    this.modal.addEventListener('click', (e) => {
+      if (e.target === this.modal) {
+        this.closeModal();
+      }
+    });
+  }
+  
+  debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+  
+  async searchPhones() {
+    const query = this.searchInput.value.trim();
+    const searchType = this.searchType.value;
+    
+    if (!query) {
+      this.resultsContainer.innerHTML = `
+        <div style="text-align: center; color: #666; padding: 40px;">
+          <div class="empty-state-icon phone-icon"></div>
+          <p>Start typing to search phone numbers, names, or companies</p>
+        </div>
+      `;
+      return;
+    }
+    
+    try {
+      const response = await fetch(`/phonebook/api/search?q=${encodeURIComponent(query)}&type=${searchType}`);
+      const results = await response.json();
+      
+      if (results.length === 0) {
+        this.resultsContainer.innerHTML = `
+          <div style="text-align: center; color: #666; padding: 40px;">
+            <div class="empty-state-icon search-icon"></div>
+            <p>No phone numbers found for "${query}"</p>
+          </div>
+        `;
+        return;
+      }
+      
+      this.resultsContainer.innerHTML = `
+        <div style="display: grid; gap: 12px;">
+          ${results.map(phone => this.renderPhoneCard(phone)).join('')}
+        </div>
+      `;
+    } catch (error) {
+      console.error('Search error:', error);
+      this.resultsContainer.innerHTML = `
+        <div style="text-align: center; color: #e74c3c; padding: 40px;">
+          <p>Error searching phone numbers</p>
+        </div>
+      `;
+    }
+  }
+  
+  renderPhoneCard(phone) {
+    const entityIcon = {
+      'CONSIGNOR': 'consignor-icon',
+      'CONSIGNEE': 'consignee-icon',
+      'AGENT': 'agent-icon',
+      'DRIVER': 'driver-icon',
+      'OWNER': 'owner-icon'
+    }[phone.entity_type] || 'phone-icon';
+    
+    return `
+      <div class="phone-card" style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; background: white;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span class="entity-type-icon ${entityIcon}"></span>
+              <strong>${phone.entity_name}</strong>
+              <span style="background: #f3f4f6; padding: 2px 8px; border-radius: 4px; font-size: 12px; text-transform: uppercase;">${phone.entity_type}</span>
+              ${phone.is_primary ? '<span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">PRIMARY</span>' : ''}
+            </div>
+            ${phone.person_name ? `
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+              <span style="color: #666; font-size: 14px;"><span class="person-icon"></span> ${phone.person_name}</span>
+              ${phone.person_designation ? `<span style="color: #999; font-size: 12px;">(${phone.person_designation})</span>` : ''}
+              ${phone.person_is_primary ? '<span style="background: #3b82f6; color: white; padding: 1px 6px; border-radius: 3px; font-size: 10px;">PRIMARY CONTACT</span>' : ''}
+            </div>
+            ` : ''}
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span style="font-family: monospace; font-size: 16px; font-weight: bold;">${phone.phone_number}</span>
+              ${phone.label ? `<span style="color: #666; font-size: 14px;">(${phone.label})</span>` : ''}
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn small secondary" onclick="phoneBookManager.editPhone(${phone.id}, '${phone.entity_type}', ${phone.entity_id}, '${phone.phone_number}', '${phone.label || ''}', ${phone.is_primary})">Edit</button>
+            ${!phone.is_primary ? `<button class="btn small" onclick="phoneBookManager.setPrimary(${phone.id})">Set Primary</button>` : ''}
+            <button class="btn small secondary" onclick="phoneBookManager.deletePhone(${phone.id})" style="color: #e74c3c;">Delete</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  openModal(entityType = null, entityId = null, phoneData = null) {
+    this.modalTitle.textContent = phoneData ? 'Edit Phone Number' : 'Add Phone Number';
+    
+    if (phoneData) {
+      document.getElementById('phoneId').value = phoneData.id;
+      document.getElementById('phoneNumber').value = phoneData.phone_number;
+      document.getElementById('phoneLabel').value = phoneData.label || '';
+      document.getElementById('isPrimary').checked = phoneData.is_primary;
+    } else {
+      document.getElementById('phoneId').value = '';
+      document.getElementById('phoneNumber').value = '';
+      document.getElementById('phoneLabel').value = '';
+      document.getElementById('isPrimary').checked = false;
+    }
+    
+    document.getElementById('entityType').value = entityType || '';
+    document.getElementById('entityId').value = entityId || '';
+    
+    this.modal.style.display = 'flex';
+  }
+  
+  closeModal() {
+    this.modal.style.display = 'none';
+    this.form.reset();
+  }
+  
+  editPhone(id, entityType, entityId, phoneNumber, label, isPrimary) {
+    this.openModal(entityType, entityId, {
+      id, phoneNumber, label, isPrimary
+    });
+  }
+  
+  async savePhone(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this.form);
+    const phoneData = {
+      phone_number: formData.get('phone_number'),
+      label: formData.get('label'),
+      is_primary: formData.get('is_primary') === 'on',
+      entity_type: formData.get('entity_type'),
+      entity_id: parseInt(formData.get('entity_id'))
+    };
+    
+    const phoneId = formData.get('phone_id');
+    const url = phoneId ? `/phonebook/api/phone/${phoneId}` : '/phonebook/api/phone';
+    const method = phoneId ? 'PUT' : 'POST';
+    
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(phoneData)
+      });
+      
+      if (response.ok) {
+        this.closeModal();
+        this.searchPhones(); // Refresh results
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Error saving phone number');
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      alert('Error saving phone number');
+    }
+  }
+  
+  async setPrimary(phoneId) {
+    if (!confirm('Set this as the primary phone number?')) return;
+    
+    try {
+      const response = await fetch(`/phonebook/api/phone/${phoneId}/set-primary`, {
+        method: 'POST'
+      });
+      
+      if (response.ok) {
+        this.searchPhones(); // Refresh results
+      } else {
+        alert('Error setting primary phone');
+      }
+    } catch (error) {
+      console.error('Set primary error:', error);
+      alert('Error setting primary phone');
+    }
+  }
+  
+  async deletePhone(phoneId) {
+    if (!confirm('Delete this phone number?')) return;
+    
+    try {
+      const response = await fetch(`/phonebook/api/phone/${phoneId}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        this.searchPhones(); // Refresh results
+      } else {
+        alert('Error deleting phone number');
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('Error deleting phone number');
+    }
+  }
+}
+
+// Initialize phone book manager
+const phoneBookManager = new PhoneBookManager();
+
+function addPhoneForEntity(entityType, entityId) {
+  phoneBookManager.openModal(entityType, entityId);
+}
+
+// Auto-search on page load if search query is provided
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('phoneSearch');
+  if (searchInput && searchInput.value.trim()) {
+    // Trigger search automatically
+    setTimeout(() => {
+      phoneBookManager.searchPhones();
+    }, 100);
+  }
+});
+</script>
+{% endblock %}

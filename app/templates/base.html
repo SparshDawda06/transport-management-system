@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TMS{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Navigation Bar -->
+        <nav class="top-navbar">
+            <div class="navbar-brand">
+                <span class="navbar-logo"></span>
+                <span class="navbar-title">TMS</span>
+            </div>
+            
+            <button class="navbar-toggler" onclick="toggleNavbar()">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="navbar-collapse" id="navbarCollapse">
+                <div class="navbar-nav">
+                    <a href="{{ url_for('main.index') }}" class="nav-item {{ 'active' if request.endpoint == 'main.index' else '' }}">
+                        Dashboard
+                    </a>
+                    
+                    <a href="{{ url_for('orders.list_orders') }}" class="nav-item {{ 'active' if 'orders' in request.endpoint else '' }}">
+                        Orders
+                    </a>
+                    
+                    <a href="{{ url_for('builty.list_builty') }}" class="nav-item {{ 'active' if 'builty' in request.endpoint else '' }}">
+                        Builty
+                    </a>
+                    
+                    <div class="nav-dropdown">
+                        <a href="#" class="nav-item dropdown-toggle">
+                            Entities
+                        </a>
+                        <div class="dropdown-menu">
+                            <a href="{{ url_for('entities.list_consignors') }}" class="dropdown-item {{ 'active' if 'entities' in request.endpoint and 'consignors' in request.endpoint else '' }}">
+                                Consignors
+                            </a>
+                            <a href="{{ url_for('entities.list_consignees') }}" class="dropdown-item {{ 'active' if 'entities' in request.endpoint and 'consignees' in request.endpoint else '' }}">
+                                Consignees
+                            </a>
+                            <a href="{{ url_for('entities.list_agents') }}" class="dropdown-item {{ 'active' if 'entities' in request.endpoint and 'agents' in request.endpoint else '' }}">
+                                Agents
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="nav-dropdown">
+                        <a href="#" class="nav-item dropdown-toggle">
+                            Fleet
+                        </a>
+                        <div class="dropdown-menu">
+                            <a href="{{ url_for('fleet.list_drivers') }}" class="dropdown-item {{ 'active' if 'fleet' in request.endpoint and 'drivers' in request.endpoint else '' }}">
+                                Drivers
+                            </a>
+                            <a href="{{ url_for('fleet.list_owners') }}" class="dropdown-item {{ 'active' if 'fleet' in request.endpoint and 'owners' in request.endpoint else '' }}">
+                                Owners
+                            </a>
+                            <a href="{{ url_for('fleet.list_vehicles') }}" class="dropdown-item {{ 'active' if 'fleet' in request.endpoint and 'vehicles' in request.endpoint else '' }}">
+                                Vehicles
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="nav-dropdown">
+                        <a href="#" class="nav-item dropdown-toggle">
+                            System
+                        </a>
+                        <div class="dropdown-menu">
+                            <a href="{{ url_for('system.list_stations') }}" class="dropdown-item {{ 'active' if 'system' in request.endpoint and 'stations' in request.endpoint else '' }}">
+                                Stations
+                            </a>
+                            <a href="{{ url_for('system.list_goods') }}" class="dropdown-item {{ 'active' if 'system' in request.endpoint and 'goods' in request.endpoint else '' }}">
+                                Goods
+                            </a>
+                            <a href="{{ url_for('system.list_pincodes') }}" class="dropdown-item {{ 'active' if 'system' in request.endpoint and 'pincodes' in request.endpoint else '' }}">
+                                Pin Codes
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <a href="{{ url_for('phonebook.list_phonebook') }}" class="nav-item {{ 'active' if 'phonebook' in request.endpoint else '' }}">
+                        Phone Book
+                    </a>
+                </div>
+                
+                <div class="navbar-actions">
+                    <div class="search-bar">
+                        <input type="text" class="search-input" placeholder="Search...">
+                        <div class="search-icon"></div>
+                    </div>
+                    
+                    <div class="user-profile">
+                        <div class="user-avatar">
+                            {% if session.get('logged_in') %}
+                                {{ session.get('username', 'U')[0].upper() }}
+                            {% else %}
+                                G
+                            {% endif %}
+                        </div>
+                        <div class="user-info">
+                            <div class="user-name">
+                                {% if session.get('logged_in') %}
+                                    {{ session.get('username', 'Guest') }}
+                                {% else %}
+                                    Guest
+                                {% endif %}
+                            </div>
+                            <div class="user-email">
+                                {% if session.get('logged_in') %}
+                                    {{ session.get('username', 'guest') }}@tms.com
+                                {% else %}
+                                    guest@tms.com
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="dropdown-arrow"></div>
+                    </div>
+                    
+                    {% if session.get('logged_in') %}
+                        <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary btn-small">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-small">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- Page Content -->
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        function toggleNavbar() {
+            const navbar = document.getElementById('navbarCollapse');
+            navbar.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdowns = document.querySelectorAll('.nav-dropdown');
+            dropdowns.forEach(dropdown => {
+                if (!dropdown.contains(event.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+        });
+
+        // Toggle dropdowns
+        document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                const dropdown = this.parentElement;
+                dropdown.classList.toggle('show');
+            });
+        });
+    </script>
+</body>
+</html>
