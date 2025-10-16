@@ -67,7 +67,7 @@ def create_pincode():
         p = PinCode(
             code=form.code.data,
             state=form.state.data,
-            station_id=form.station_id.data if form.station_id.data != 0 else None,
+            station_id=form.station_id.data,
         )
         db.session.add(p)
         db.session.flush()

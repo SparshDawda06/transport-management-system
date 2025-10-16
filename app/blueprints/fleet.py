@@ -39,8 +39,8 @@ def create_vehicle():
             capacity=form.capacity.data,
             chassis_no=form.chassis_no.data,
             engine_no=form.engine_no.data,
-            owner_id=form.owner_id.data if form.owner_id.data != 0 else None,
-            driver_id=form.driver_id.data if form.driver_id.data != 0 else None,
+            owner_id=form.owner_id.data,
+            driver_id=form.driver_id.data,
         )
         db.session.add(v)
         db.session.flush()

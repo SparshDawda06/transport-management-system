@@ -39,8 +39,8 @@ def create_consignor():
             address=form.address.data,
             gstin=form.gstin.data,
             pan=form.pan.data,
-            station_id=form.station_id.data if form.station_id.data != 0 else None,
-            pin_code_id=form.pin_code_id.data if form.pin_code_id.data != 0 else None,
+            station_id=form.station_id.data,
+            pin_code_id=form.pin_code_id.data,
             phone=form.phone.data,
             email=form.email.data,
         )
@@ -79,9 +79,7 @@ def edit_consignor(item_id):
         c.address = form.address.data
         c.gstin = form.gstin.data
         c.pan = form.pan.data
-        c.station_id = form.station_id.data if form.station_id.data != 0 else None
-        c.pin_code_id = form.pin_code_id.data if form.pin_code_id.data != 0 else None
-        c.phone = form.phone.data
+        c.station_id = form.station_id.data        c.pin_code_id = form.pin_code_id.data        c.phone = form.phone.data
         c.email = form.email.data
         db.session.add(c)
         db.session.add(TransactionLog(entity="Consignor", entity_id=c.id, action="UPDATE"))
@@ -113,8 +111,8 @@ def create_consignee():
             address=form.address.data,
             gstin=form.gstin.data,
             pan=form.pan.data,
-            station_id=form.station_id.data if form.station_id.data != 0 else None,
-            pin_code_id=form.pin_code_id.data if form.pin_code_id.data != 0 else None,
+            station_id=form.station_id.data,
+            pin_code_id=form.pin_code_id.data,
             phone=form.phone.data,
             email=form.email.data,
         )
@@ -141,9 +139,7 @@ def edit_consignee(item_id):
         c.address = form.address.data
         c.gstin = form.gstin.data
         c.pan = form.pan.data
-        c.station_id = form.station_id.data if form.station_id.data != 0 else None
-        c.pin_code_id = form.pin_code_id.data if form.pin_code_id.data != 0 else None
-        c.phone = form.phone.data
+        c.station_id = form.station_id.data        c.pin_code_id = form.pin_code_id.data        c.phone = form.phone.data
         c.email = form.email.data
         db.session.add(c)
         db.session.add(TransactionLog(entity="Consignee", entity_id=c.id, action="UPDATE"))
