@@ -27,7 +27,7 @@
                         Dashboard
                     </a>
                     
-                    <a href="{{ url_for('orders.list_orders') }}" class="nav-item {{ 'active' if 'orders' in request.endpoint else '' }}">
+                    <a href="{{ url_for('orders.list_orders') }}" class="nav-item {{ 'active' if request.endpoint and 'orders' in request.endpoint else '' }}">
                         Orders
                     </a>
                     
