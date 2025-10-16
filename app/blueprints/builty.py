@@ -3,6 +3,7 @@ from datetime import date
 from ..extensions import db
 from ..models import Builty, Order, Vehicle, Driver, Owner, Station, Goods, TransactionLog, Consignor, Consignee, BookingAgent
 from ..forms import BuiltyForm
+from ..auth import login_required
 
 bp = Blueprint("builty", __name__, url_prefix="/builty")
 
@@ -258,6 +259,7 @@ def create_builty():
 
 
 @bp.route("/<int:builty_id>/view")
+@login_required
 def view_builty(builty_id):
     builty = Builty.query.options(
         db.joinedload(Builty.order),
@@ -272,6 +274,20 @@ def view_builty(builty_id):
         db.joinedload(Builty.booking_agent)
     ).get_or_404(builty_id)
     return render_template("builty/detail.html", builty=builty)
+
+
+@bp.route("/<int:builty_id>", methods=["DELETE"])
+@login_required
+def delete_builty(builty_id):
+    builty = Builty.query.get_or_404(builty_id)
+    
+    try:
+        db.session.delete(builty)
+        db.session.commit()
+        return jsonify({"success": True, "message": "Builty deleted successfully"})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": f"Error deleting builty: {str(e)}"}), 500
 
 
 @bp.route("/<int:builty_id>/edit", methods=["GET", "POST"])

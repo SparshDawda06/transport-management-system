@@ -5,12 +5,21 @@
   <div class="detail-header">
     <div>
       <h1 class="detail-title">Order #{{ order.id }}</h1>
-      <p class="text-sm text-secondary">{{ order.date.strftime('%B %d, %Y') }}</p>
+      <p class="detail-subtitle">{{ order.date.strftime('%B %d, %Y at %I:%M %p') }}</p>
     </div>
     <div class="detail-actions">
-      <a href="{{ url_for('orders.edit_order', order_id=order.id) }}" class="btn btn-primary">Edit</a>
-      <button onclick="deleteOrder({{ order.id }})" class="btn btn-secondary">Delete</button>
-      <a href="{{ url_for('orders.list_orders') }}" class="btn btn-secondary">Back to List</a>
+      <a href="{{ url_for('orders.edit_order', order_id=order.id) }}" class="btn btn-primary">
+        <i class="fas fa-edit"></i> Edit
+      </a>
+      <button onclick="printOrder()" class="btn btn-info">
+        <i class="fas fa-print"></i> Print
+      </button>
+      <button onclick="deleteOrder({{ order.id }})" class="btn btn-danger">
+        <i class="fas fa-trash"></i> Delete
+      </button>
+      <a href="{{ url_for('orders.list_orders') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to List
+      </a>
     </div>
   </div>
   
@@ -69,10 +78,34 @@
         <div class="detail-label">Consignor</div>
         <div class="detail-value">{{ order.consignor.name if order.consignor else 'Not specified' }}</div>
       </div>
+      {% if order.consignor_concerned_person %}
+      <div class="detail-grid">
+        <div class="detail-label">Consignor Contact</div>
+        <div class="detail-value">{{ order.consignor_concerned_person.name }}{% if order.consignor_concerned_person.designation %} ({{ order.consignor_concerned_person.designation }}){% endif %}</div>
+      </div>
+      {% endif %}
+      {% if order.consignor_phone_number %}
+      <div class="detail-grid">
+        <div class="detail-label">Consignor Phone</div>
+        <div class="detail-value">{{ order.consignor_phone_number.phone_number }}</div>
+      </div>
+      {% endif %}
       <div class="detail-grid">
         <div class="detail-label">Consignee</div>
         <div class="detail-value">{{ order.consignee.name if order.consignee else 'Not specified' }}</div>
       </div>
+      {% if order.consignee_concerned_person %}
+      <div class="detail-grid">
+        <div class="detail-label">Consignee Contact</div>
+        <div class="detail-value">{{ order.consignee_concerned_person.name }}{% if order.consignee_concerned_person.designation %} ({{ order.consignee_concerned_person.designation }}){% endif %}</div>
+      </div>
+      {% endif %}
+      {% if order.consignee_phone_number %}
+      <div class="detail-grid">
+        <div class="detail-label">Consignee Phone</div>
+        <div class="detail-value">{{ order.consignee_phone_number.phone_number }}</div>
+      </div>
+      {% endif %}
     </div>
     {% else %}
     <div class="detail-section">
@@ -81,6 +114,18 @@
         <div class="detail-label">Booking Agent</div>
         <div class="detail-value">{{ order.booking_agent.name if order.booking_agent else 'Not specified' }}</div>
       </div>
+      {% if order.agent_concerned_person %}
+      <div class="detail-grid">
+        <div class="detail-label">Agent Contact</div>
+        <div class="detail-value">{{ order.agent_concerned_person.name }}{% if order.agent_concerned_person.designation %} ({{ order.agent_concerned_person.designation }}){% endif %}</div>
+      </div>
+      {% endif %}
+      {% if order.agent_phone_number %}
+      <div class="detail-grid">
+        <div class="detail-label">Agent Phone</div>
+        <div class="detail-value">{{ order.agent_phone_number.phone_number }}</div>
+      </div>
+      {% endif %}
     </div>
     {% endif %}
 
@@ -120,7 +165,7 @@
 
 <script>
 function deleteOrder(orderId) {
-  if (confirm('Are you sure you want to delete this order?')) {
+  if (confirm('Are you sure you want to delete this order? This action cannot be undone.')) {
     fetch(`/orders/${orderId}`, {
       method: 'DELETE',
       headers: {
@@ -130,16 +175,55 @@ function deleteOrder(orderId) {
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        window.location.href = '/orders';
+        TMS.showNotification('Order deleted successfully', 'success');
+        setTimeout(() => {
+          window.location.href = '/orders';
+        }, 1500);
       } else {
-        alert('Error deleting order');
+        TMS.showNotification(data.message || 'Error deleting order', 'error');
       }
     })
     .catch(error => {
       console.error('Error:', error);
-      alert('Error deleting order');
+      TMS.showNotification('Error deleting order', 'error');
     });
   }
 }
+
+function printOrder() {
+  // Add print-specific styling
+  const printStyles = document.createElement('style');
+  printStyles.textContent = `
+    @media print {
+      body * { visibility: hidden; }
+      .detail-container, .detail-container * { visibility: visible; }
+      .detail-container { position: absolute; left: 0; top: 0; width: 100%; }
+      .detail-actions { display: none !important; }
+    }
+  `;
+  document.head.appendChild(printStyles);
+  
+  // Print the page
+  window.print();
+  
+  // Remove the print styles after printing
+  setTimeout(() => {
+    document.head.removeChild(printStyles);
+  }, 1000);
+}
+
+// Add keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+  // Ctrl+P or Cmd+P for print
+  if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+    e.preventDefault();
+    printOrder();
+  }
+  
+  // Escape key to go back
+  if (e.key === 'Escape') {
+    window.location.href = '/orders';
+  }
+});
 </script>
 {% endblock %}

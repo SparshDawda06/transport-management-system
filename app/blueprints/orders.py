@@ -200,6 +200,20 @@ def view_order(order_id):
     return render_template("orders/detail.html", order=order)
 
 
+@bp.route("/<int:order_id>", methods=["DELETE"])
+@login_required
+def delete_order(order_id):
+    order = Order.query.get_or_404(order_id)
+    
+    try:
+        db.session.delete(order)
+        db.session.commit()
+        return jsonify({"success": True, "message": "Order deleted successfully"})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": f"Error deleting order: {str(e)}"}), 500
+
+
 @bp.route("/<int:order_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_order(order_id):
