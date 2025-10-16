@@ -342,10 +342,7 @@ def edit_builty(builty_id):
             builty.charged_weight = form.charged_weight.data
             builty.rate = form.rate.data
             builty.advance_amount = form.advance_amount.data
-            builty.consignor_id = form.consignor_id.data if form.consignor_id.data != 0 else None
-            builty.consignee_id = form.consignee_id.data if form.consignee_id.data != 0 else None
-            builty.booking_agent_id = form.booking_agent_id.data if form.booking_agent_id.data != 0 else None
-            
+            builty.consignor_id = form.consignor_id.data            builty.consignee_id = form.consignee_id.data            builty.booking_agent_id = form.booking_agent_id.data            
             # Update phone book fields
             builty.consignor_concerned_person_id = request.form.get('consignor_concerned_person_id') if request.form.get('consignor_concerned_person_id') != '' else None
             builty.consignor_phone_number_id = request.form.get('consignor_phone_number_id') if request.form.get('consignor_phone_number_id') != '' else None
