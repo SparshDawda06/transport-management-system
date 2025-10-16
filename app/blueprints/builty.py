@@ -91,9 +91,11 @@ def create_builty():
     form.booking_agent_id.choices = [(0, 'Select Agent')] + choices['agents']
     
     # Debug: Check if all fields have choices
+    import logging
+    logger = logging.getLogger(__name__)
     for field_name, field in form._fields.items():
         if hasattr(field, 'choices') and field.choices is None:
-            print(f"Field {field_name} has no choices")
+            logger.warning(f"Field {field_name} has no choices")
     
     if not form.date.data:
         form.date.data = date.today()
@@ -227,7 +229,10 @@ def create_builty():
         except Exception as e:
             db.session.rollback()
             flash(f"Error creating builty: {str(e)}", "error")
-            print(f"Builty creation error: {str(e)}")  # Debug log
+            # Log error for debugging
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Builty creation error: {str(e)}")
             
             # Handle AJAX requests differently
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
