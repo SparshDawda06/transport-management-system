@@ -193,14 +193,14 @@ def create_builty():
                 status=form.status.data,
                 invoice_no=form.invoice_no.data,
                 eway_bill_no=form.eway_bill_no.data,
-                goods_id=form.goods_id.data if form.goods_id.data != 0 else None,
+                goods_id=form.goods_id.data,
                 actual_weight=form.actual_weight.data,
                 charged_weight=form.charged_weight.data,
                 rate=form.rate.data,
                 advance_amount=form.advance_amount.data,
-                consignor_id=form.consignor_id.data if form.consignor_id.data != 0 else None,
-                consignee_id=form.consignee_id.data if form.consignee_id.data != 0 else None,
-                booking_agent_id=form.booking_agent_id.data if form.booking_agent_id.data != 0 else None,
+                consignor_id=form.consignor_id.data,
+                consignee_id=form.consignee_id.data,
+                booking_agent_id=form.booking_agent_id.data,
                 # Phone book fields
                 consignor_concerned_person_id=request.form.get('consignor_concerned_person_id') if request.form.get('consignor_concerned_person_id') != '' else None,
                 consignor_phone_number_id=request.form.get('consignor_phone_number_id') if request.form.get('consignor_phone_number_id') != '' else None,
@@ -217,11 +217,11 @@ def create_builty():
             if order:
                 order.status = "DISPATCHED"
                 # Sync consignor/consignee data from builty to order
-                if form.consignor_id.data and form.consignor_id.data != 0:
+                if form.consignor_id.data:
                     order.consignor_id = form.consignor_id.data
-                if form.consignee_id.data and form.consignee_id.data != 0:
+                if form.consignee_id.data:
                     order.consignee_id = form.consignee_id.data
-                if form.booking_agent_id.data and form.booking_agent_id.data != 0:
+                if form.booking_agent_id.data:
                     order.booking_agent_id = form.booking_agent_id.data
                 db.session.add(order)
             
@@ -332,19 +332,13 @@ def edit_builty(builty_id):
     if form.validate_on_submit():
         try:
             # Update builty fields
-            builty.vehicle_id = form.vehicle_id.data if form.vehicle_id.data != 0 else None
-            builty.driver_id = form.driver_id.data if form.driver_id.data != 0 else None
-            builty.owner_id = form.owner_id.data if form.owner_id.data != 0 else None
-            builty.date = form.date.data
-            builty.from_station_id = form.from_station_id.data if form.from_station_id.data != 0 else None
-            builty.to_station_id = form.to_station_id.data if form.to_station_id.data != 0 else None
-            builty.firm = form.firm.data
+            builty.vehicle_id = form.vehicle_id.data            builty.driver_id = form.driver_id.data            builty.owner_id = form.owner_id.data            builty.date = form.date.data
+            builty.from_station_id = form.from_station_id.data            builty.to_station_id = form.to_station_id.data            builty.firm = form.firm.data
             builty.lr_no = form.lr_no.data
             builty.status = form.status.data
             builty.invoice_no = form.invoice_no.data
             builty.eway_bill_no = form.eway_bill_no.data
-            builty.goods_id = form.goods_id.data if form.goods_id.data != 0 else None
-            builty.actual_weight = form.actual_weight.data
+            builty.goods_id = form.goods_id.data            builty.actual_weight = form.actual_weight.data
             builty.charged_weight = form.charged_weight.data
             builty.rate = form.rate.data
             builty.advance_amount = form.advance_amount.data
@@ -366,11 +360,11 @@ def edit_builty(builty_id):
             order = Order.query.get(builty.order_id)
             if order:
                 # Sync consignor/consignee data from builty to order
-                if form.consignor_id.data and form.consignor_id.data != 0:
+                if form.consignor_id.data:
                     order.consignor_id = form.consignor_id.data
-                if form.consignee_id.data and form.consignee_id.data != 0:
+                if form.consignee_id.data:
                     order.consignee_id = form.consignee_id.data
-                if form.booking_agent_id.data and form.booking_agent_id.data != 0:
+                if form.booking_agent_id.data:
                     order.booking_agent_id = form.booking_agent_id.data
                 db.session.add(order)
             
